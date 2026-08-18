@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "ios-spm-notivera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Notivera/ios-spm-notivera",
+      "state" : {
+        "revision" : "124d5e21e2c4ad6e0a1d88fc6f3ed482df05df9f",
+        "version" : "5.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}

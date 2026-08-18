@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "985441474140",
+    "project_id": "notivera-54290",
+    "storage_bucket": "notivera-54290.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:985441474140:android:770c4063981738c04a3899",
+        "android_client_info": {
+          "package_name": "com.notivera.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPzqJiYiev2TIIpoQPMhP8TQb_-_0xQhw"
+        },
+        {
+          "current_key": "AIzaSyDzbmyrQweQCbmMUr_RgM0SNV-yz7gd8IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:985441474140:android:ebbc33f5c8fda63f4a3899",
+        "android_client_info": {
+          "package_name": "com.notivera.demo.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPzqJiYiev2TIIpoQPMhP8TQb_-_0xQhw"
+        },
+        {
+          "current_key": "AIzaSyDzbmyrQweQCbmMUr_RgM0SNV-yz7gd8IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:985441474140:android:6389d5ce763b48ad4a3899",
+        "android_client_info": {
+          "package_name": "com.notivera.sdk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPzqJiYiev2TIIpoQPMhP8TQb_-_0xQhw"
+        },
+        {
+          "current_key": "AIzaSyDzbmyrQweQCbmMUr_RgM0SNV-yz7gd8IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
