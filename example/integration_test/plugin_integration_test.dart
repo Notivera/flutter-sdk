@@ -7,6 +7,8 @@ void main() {
 
   testWidgets('example app loads', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
+    await tester.pump();
     expect(find.text('Notivera'), findsOneWidget);
+    expect(find.text('Home'), findsWidgets);
   });
 }

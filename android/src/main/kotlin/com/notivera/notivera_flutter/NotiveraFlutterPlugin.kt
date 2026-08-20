@@ -2,6 +2,7 @@ package com.notivera.notivera_flutter
 
 import android.app.Activity
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.Observer
 import com.notivera.sdk.SDK
 import com.notivera.sdk.SDKConfig
@@ -12,6 +13,10 @@ import com.notivera.sdk.business.data.PushEvent as SdkPushEvent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import java.util.regex.Pattern
 
 class NotiveraFlutterPlugin :
     FlutterPlugin,
@@ -85,14 +90,19 @@ class NotiveraFlutterPlugin :
         tag: String,
         callback: (Result<String>) -> Unit,
     ) {
-        invokeAsync(callback) { SDK.subscribeTag(tag, it) }
+        invokeAsync(callback, operation = "subscribeTag", context = mapOf("tag" to tag)) {
+            Log.d(TAG, "subscribeTag requested tag=$tag deviceId=${SDK.getDeviceId()}")
+            SDK.subscribeTag(tag, it)
+        }
     }
 
     override fun unsubscribeTag(
         tag: String,
         callback: (Result<String>) -> Unit,
     ) {
-        invokeAsync(callback) { SDK.unsubscribeTag(tag, it) }
+        invokeAsync(callback, operation = "unsubscribeTag", context = mapOf("tag" to tag)) {
+            SDK.unsubscribeTag(tag, it)
+        }
     }
 
     override fun updatePersonalisationVariables(
@@ -100,7 +110,13 @@ class NotiveraFlutterPlugin :
         callback: (Result<String>) -> Unit,
     ) {
         val schema = entries.associate { it.name to it.value }
-        invokeAsync(callback) { SDK.updatePersonalisationVariables(schema, it) }
+        invokeAsync(
+            callback,
+            operation = "updatePersonalisationVariables",
+            context = mapOf("keys" to entries.map { it.name }.joinToString(",")),
+        ) {
+            SDK.updatePersonalisationVariables(schema, it)
+        }
     }
 
     override fun getAllPersonalisations(): List<PersonalisationEntry> {
@@ -114,7 +130,13 @@ class NotiveraFlutterPlugin :
         customIdentifier: String,
         callback: (Result<String>) -> Unit,
     ) {
-        invokeAsync(callback) { SDK.showInAppNotification(customIdentifier, it) }
+        invokeAsync(
+            callback,
+            operation = "showInAppNotification",
+            context = mapOf("customIdentifier" to customIdentifier),
+        ) {
+            SDK.showInAppNotification(customIdentifier, it)
+        }
     }
 
     override fun closeNotificationView() {
@@ -137,7 +159,7 @@ class NotiveraFlutterPlugin :
             SDK.requestGeofencePermission(current)
             callback(Result.success(Unit))
         } catch (error: Throwable) {
-            callback(Result.failure(error))
+            callback(Result.failure(error.toFlutterError(operation = "requestAuthorisationPrompts")))
         }
     }
 
@@ -158,6 +180,8 @@ class NotiveraFlutterPlugin :
 
     private fun invokeAsync(
         callback: (Result<String>) -> Unit,
+        operation: String,
+        context: Map<String, String> = emptyMap(),
         call: (SDKResponse<String>) -> Unit,
     ) {
         try {
@@ -165,20 +189,30 @@ class NotiveraFlutterPlugin :
             call(
                 object : SDKResponse<String> {
                     override fun onSuccess(result: String) {
+                        Log.d(TAG, "$operation success result=$result context=$context")
                         callback(Result.success(result))
                     }
 
                     override fun onError(throwable: Throwable) {
-                        callback(
-                            Result.failure(
-                                FlutterError("sdk-error", throwable.message, null),
-                            ),
+                        val flutterError =
+                            throwable.toFlutterError(operation = operation, context = context)
+                        Log.e(
+                            TAG,
+                            "$operation failed code=${flutterError.code} message=${flutterError.message} details=${flutterError.details}",
+                            throwable,
                         )
+                        callback(Result.failure(flutterError))
                     }
                 },
             )
         } catch (error: Throwable) {
-            callback(Result.failure(error))
+            val flutterError = error.toFlutterError(operation = operation, context = context)
+            Log.e(
+                TAG,
+                "$operation threw code=${flutterError.code} message=${flutterError.message}",
+                error,
+            )
+            callback(Result.failure(flutterError))
         }
     }
 
@@ -203,7 +237,164 @@ class NotiveraFlutterPlugin :
         eventObserver = observer
         SDK.pushEvent.observeForever(observer)
     }
+
+    companion object {
+        private const val TAG = "NotiveraFlutterPlugin"
+    }
 }
+
+private fun Throwable.toFlutterError(
+    operation: String,
+    context: Map<String, String> = emptyMap(),
+): FlutterError {
+    if (this is FlutterError) {
+        return this
+    }
+
+    val details =
+        mutableMapOf<String, Any?>(
+            "operation" to operation,
+            "exceptionType" to (this::class.java.name),
+            "deviceId" to runCatching { SDK.getDeviceId() }.getOrNull(),
+        )
+    details.putAll(context)
+
+    // Retrofit is transitive via the native SDK AAR and is not a compile dependency of
+    // this Flutter plugin, so detect HttpException by name / reflection.
+    val httpDetails = extractHttpDetails(this)
+    if (httpDetails != null) {
+        details.putAll(httpDetails)
+        val code = httpDetails["httpCode"] as? Int
+        val requestUrl = httpDetails["requestUrl"] as? String
+        val responseBody = httpDetails["responseBody"] as? String
+        return FlutterError(
+            if (code != null) "http-$code" else "http-error",
+            buildString {
+                append("HTTP ")
+                append(code ?: "error")
+                append(" during ")
+                append(operation)
+                if (!requestUrl.isNullOrBlank()) {
+                    append(" (")
+                    append(requestUrl)
+                    append(")")
+                }
+                when {
+                    !responseBody.isNullOrBlank() -> {
+                        append(": ")
+                        append(responseBody.take(500))
+                    }
+                    !message.isNullOrBlank() -> {
+                        append(": ")
+                        append(message)
+                    }
+                }
+            },
+            details,
+        )
+    }
+
+    return when (this) {
+        is UnknownHostException ->
+            FlutterError(
+                "network-unreachable",
+                "Network unreachable during $operation: ${message ?: "unknown host"}",
+                details,
+            )
+        is SocketTimeoutException ->
+            FlutterError(
+                "network-timeout",
+                "Network timeout during $operation: ${message ?: "timed out"}",
+                details,
+            )
+        is IOException ->
+            FlutterError(
+                "network-error",
+                "Network error during $operation: ${message ?: javaClass.simpleName}",
+                details,
+            )
+        else ->
+            FlutterError(
+                "sdk-error",
+                message?.takeIf { it.isNotBlank() }
+                    ?: "$operation failed with ${javaClass.simpleName}",
+                details,
+            )
+    }
+}
+
+private fun extractHttpDetails(error: Throwable): Map<String, Any?>? {
+    val className = error.javaClass.name
+    val looksLikeHttp =
+        className == "retrofit2.HttpException" ||
+            className.endsWith(".HttpException") ||
+            (error.message?.contains("HTTP ") == true)
+
+    if (!looksLikeHttp) {
+        return null
+    }
+
+    val reflectedCode =
+        runCatching {
+            error.javaClass.methods
+                .firstOrNull { it.name == "code" && it.parameterTypes.isEmpty() }
+                ?.invoke(error) as? Int
+        }.getOrNull()
+
+    val messageCode =
+        run {
+            val matcher = HTTP_CODE_PATTERN.matcher(error.message ?: "")
+            if (matcher.find()) matcher.group(1).toIntOrNull() else null
+        }
+
+    val code = reflectedCode ?: messageCode
+
+    val response =
+        runCatching {
+            error.javaClass.methods
+                .firstOrNull { it.name == "response" && it.parameterTypes.isEmpty() }
+                ?.invoke(error)
+        }.getOrNull()
+
+    val requestUrl =
+        runCatching {
+            val raw =
+                response?.javaClass?.methods
+                    ?.firstOrNull { it.name == "raw" && it.parameterTypes.isEmpty() }
+                    ?.invoke(response)
+            val request =
+                raw?.javaClass?.methods
+                    ?.firstOrNull { it.name == "request" && it.parameterTypes.isEmpty() }
+                    ?.invoke(raw)
+            val url =
+                request?.javaClass?.methods
+                    ?.firstOrNull { it.name == "url" && it.parameterTypes.isEmpty() }
+                    ?.invoke(request)
+            url?.toString()
+        }.getOrNull()
+
+    val responseBody =
+        runCatching {
+            val errorBody =
+                response?.javaClass?.methods
+                    ?.firstOrNull { it.name == "errorBody" && it.parameterTypes.isEmpty() }
+                    ?.invoke(response)
+            errorBody?.javaClass?.methods
+                ?.firstOrNull { it.name == "string" && it.parameterTypes.isEmpty() }
+                ?.invoke(errorBody) as? String
+        }.getOrNull()
+            ?.takeIf { it.isNotBlank() }
+
+    return mapOf(
+        "httpCode" to code,
+        "httpMessage" to error.message,
+        "requestUrl" to requestUrl,
+        "responseBody" to responseBody,
+    )
+}
+
+private val HTTP_CODE_PATTERN: Pattern = Pattern.compile("""HTTP\s+(\d{3})""")
+
 
 private fun NotiveraConfig.toSdk(): SDKConfig =
     SDKConfig(

@@ -1,0 +1,67 @@
+{
+  "notification": {
+    "id": "add0b06c-122a-4be6-ab42-cfd9e41acae9",
+    "title": "New Kit Launch",
+    "subTitle": null,
+    "description": null,
+    "message": "Checkout the 2023 Houston Dynamo kit now available",
+    "type": "VIDEO",
+    "metadata": null,
+    "clientMetadata": null,
+    "contents": [
+      {
+        "id": "5ca80148-bb7c-46cb-860a-c1635fa92a51",
+        "name": "Kit_Launch.mp4",
+        "mediaType": "VIDEO",
+        "presentation": "DEFAULT",
+        "ttl": -1,
+        "downloadUrl": "https://d1s7rrw7tnkt7k.cloudfront.net/content-items/5cb19fa1-3a81-4281-96d1-3c22feaa1840/Kit_Launch.mp4?AWSAccessKeyId=ASIAVNV3Z5MKXTKXXNA7&Expires=1678282609&Signature=OwGcCdcBL1xj5bIiUQgvMbvA5aU%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEF4aCWV1LXdlc3QtMSJIMEYCIQCAsJMpTIKDdDKgbHHdfE5GPUFI6m3TlU0nsiUwfI9NQwIhAOYwT4mZVWoBgCXv38i1Bd6sMzAxYKhS9neaTH9ov0k9KqsDCBcQAhoMMzcyOTgyMjc4OTMzIgxL36LW7i5FsIYBLk8qiANuYWpl90gTZks1Z2jrBR7laURp7RPljb3UjZvhtOy1KBaPgdqAv8K8Gk%2FPT2%2Fr7p51vExEj8h694vv3bJVK6AqGNfz2vh66%2FCzKktEAGS2RuzI%2FylPTJtbi3x3D4XnH9A6AKctqxetY622pMQYclZGk4GS9WTTvA%2BuWA4w5eefzb9wlVHx6Ur4hcVEts0OlrFlDt5DHBYKTWMWemEHA5rNwQiQpYQESGzcA7K9WFc6gw50rY2TN69RhrscrCdy7ZWBgDjNN7x5pd7B7p24YyuzxseoI%2FC0TfzWqVMCjfjOmB3vfp6vbkjVlgZ0N7LU4AELSiEdwVe%2BqQ%2BchYPcusznrARLiIMMHZ5zFDtWmSPl2zckmDQhE5kC%2Fql%2Fx41xFOZnI4VqNQHFGZljBl6ozDwY5bxD6ufDdCvvmxuRLuAJawFN7%2BE32vBiTW87xmvjSgh9NTJoZ7ZTiYzcJDe6JFqBFmJ6Y%2BzF6Nl60idMZFYVB93zogQTInDY7En24Tyg7mehJrKyh%2B%2FrfDDv2JegBjqcAUTTmBEYQ8QCWw8e%2BqWD1toltvO8Ev4iSZbTeiXoZrTtlbeMg%2FEwvPw8UapqaR4h3Un0REjC3YfEslgAsb5wmBgxa8d0%2F8n8nIMqRrJhT0p98xpgk3Up3Sn7Yv5JMzUuhJvGdyOL7LB0kG1Pgmx%2FoVPT65yPmDeL3Agt1VxG5DWhx5RpU3MWp1Gri1d7%2FpFs8U62XxL3u6Zmgd9xCA%3D%3D",
+        "width": 1080,
+        "height": 2280,
+        "defaultContent": false,
+        "options": {
+          "orientation": "portrait",
+          "zoomMode": "zoom",
+          "useEmbeddedPlayer": true,
+          "allowPreview": true,
+          "fullScreen": true,
+          "buttons": [
+            {
+              "displayName": "Button 1",
+              "url": "https://www.mlsstore.com/houston-dynamo-fc/mens-houston-dynamo-fc-adidas-orange-2023-el-sol-authentic-jersey/t-36902469+p-5079411332901+z-9-3365209968?_ref=p-DLP:m-GRID:i-r0c0:po-0",
+              "linkHandling": "defaultBrowser",
+              "font": "Arial",
+              "fontSize": "41",
+              "contentItemId": "834bc360-8f14-42e9-90f3-dc2399a5fb06",
+              "position": {
+                "top": 2047,
+                "left": 140,
+                "bottom": 2192,
+                "right": 933
+              },
+              "buttonAppear": 7000,
+              "fullScreen": false,
+              "buttonImageUrl": "https://d1s7rrw7tnkt7k.cloudfront.net/content-items/5cb19fa1-3a81-4281-96d1-3c22feaa1840/transparent_picture.png?AWSAccessKeyId=ASIAVNV3Z5MKXTKXXNA7&Expires=1678282609&Signature=yEj2iYQ%2BfIeJKVdUSq3VM4lP26Y%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEF4aCWV1LXdlc3QtMSJIMEYCIQCAsJMpTIKDdDKgbHHdfE5GPUFI6m3TlU0nsiUwfI9NQwIhAOYwT4mZVWoBgCXv38i1Bd6sMzAxYKhS9neaTH9ov0k9KqsDCBcQAhoMMzcyOTgyMjc4OTMzIgxL36LW7i5FsIYBLk8qiANuYWpl90gTZks1Z2jrBR7laURp7RPljb3UjZvhtOy1KBaPgdqAv8K8Gk%2FPT2%2Fr7p51vExEj8h694vv3bJVK6AqGNfz2vh66%2FCzKktEAGS2RuzI%2FylPTJtbi3x3D4XnH9A6AKctqxetY622pMQYclZGk4GS9WTTvA%2BuWA4w5eefzb9wlVHx6Ur4hcVEts0OlrFlDt5DHBYKTWMWemEHA5rNwQiQpYQESGzcA7K9WFc6gw50rY2TN69RhrscrCdy7ZWBgDjNN7x5pd7B7p24YyuzxseoI%2FC0TfzWqVMCjfjOmB3vfp6vbkjVlgZ0N7LU4AELSiEdwVe%2BqQ%2BchYPcusznrARLiIMMHZ5zFDtWmSPl2zckmDQhE5kC%2Fql%2Fx41xFOZnI4VqNQHFGZljBl6ozDwY5bxD6ufDdCvvmxuRLuAJawFN7%2BE32vBiTW87xmvjSgh9NTJoZ7ZTiYzcJDe6JFqBFmJ6Y%2BzF6Nl60idMZFYVB93zogQTInDY7En24Tyg7mehJrKyh%2B%2FrfDDv2JegBjqcAUTTmBEYQ8QCWw8e%2BqWD1toltvO8Ev4iSZbTeiXoZrTtlbeMg%2FEwvPw8UapqaR4h3Un0REjC3YfEslgAsb5wmBgxa8d0%2F8n8nIMqRrJhT0p98xpgk3Up3Sn7Yv5JMzUuhJvGdyOL7LB0kG1Pgmx%2FoVPT65yPmDeL3Agt1VxG5DWhx5RpU3MWp1Gri1d7%2FpFs8U62XxL3u6Zmgd9xCA%3D%3D",
+              "width": 1920,
+              "height": 1080
+            }
+          ],
+          "allowSharing": false,
+          "allowScrubbing": false
+        }
+      },
+      {
+        "id": "16ac2cc3-c842-4361-98a6-86c8c2ba0de8",
+        "name": "Kit_Launch_Banner.png",
+        "mediaType": "IMAGE",
+        "presentation": "BANNER",
+        "ttl": -1,
+        "downloadUrl": "https://d1s7rrw7tnkt7k.cloudfront.net/content-items/5cb19fa1-3a81-4281-96d1-3c22feaa1840/Kit_Launch_Banner.png?AWSAccessKeyId=ASIAVNV3Z5MKXTKXXNA7&Expires=1678282609&Signature=WBKIciq4fIclqhb4HUvzHa2Sh08%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEF4aCWV1LXdlc3QtMSJIMEYCIQCAsJMpTIKDdDKgbHHdfE5GPUFI6m3TlU0nsiUwfI9NQwIhAOYwT4mZVWoBgCXv38i1Bd6sMzAxYKhS9neaTH9ov0k9KqsDCBcQAhoMMzcyOTgyMjc4OTMzIgxL36LW7i5FsIYBLk8qiANuYWpl90gTZks1Z2jrBR7laURp7RPljb3UjZvhtOy1KBaPgdqAv8K8Gk%2FPT2%2Fr7p51vExEj8h694vv3bJVK6AqGNfz2vh66%2FCzKktEAGS2RuzI%2FylPTJtbi3x3D4XnH9A6AKctqxetY622pMQYclZGk4GS9WTTvA%2BuWA4w5eefzb9wlVHx6Ur4hcVEts0OlrFlDt5DHBYKTWMWemEHA5rNwQiQpYQESGzcA7K9WFc6gw50rY2TN69RhrscrCdy7ZWBgDjNN7x5pd7B7p24YyuzxseoI%2FC0TfzWqVMCjfjOmB3vfp6vbkjVlgZ0N7LU4AELSiEdwVe%2BqQ%2BchYPcusznrARLiIMMHZ5zFDtWmSPl2zckmDQhE5kC%2Fql%2Fx41xFOZnI4VqNQHFGZljBl6ozDwY5bxD6ufDdCvvmxuRLuAJawFN7%2BE32vBiTW87xmvjSgh9NTJoZ7ZTiYzcJDe6JFqBFmJ6Y%2BzF6Nl60idMZFYVB93zogQTInDY7En24Tyg7mehJrKyh%2B%2FrfDDv2JegBjqcAUTTmBEYQ8QCWw8e%2BqWD1toltvO8Ev4iSZbTeiXoZrTtlbeMg%2FEwvPw8UapqaR4h3Un0REjC3YfEslgAsb5wmBgxa8d0%2F8n8nIMqRrJhT0p98xpgk3Up3Sn7Yv5JMzUuhJvGdyOL7LB0kG1Pgmx%2FoVPT65yPmDeL3Agt1VxG5DWhx5RpU3MWp1Gri1d7%2FpFs8U62XxL3u6Zmgd9xCA%3D%3D",
+        "width": 380,
+        "height": 70,
+        "defaultContent": false
+      }
+    ],
+    "ttl": 604800
+  }
+}
