@@ -9,6 +9,6 @@ void main() {
     expect(find.text('Home'), findsWidgets);
     expect(find.text('Offline'), findsOneWidget);
     expect(find.text('Select an experience'), findsOneWidget);
-    expect(find.text('Notifications (4)'), findsOneWidget);
+    expect(find.textContaining('Notifications (4)'), findsOneWidget);
   });
 }

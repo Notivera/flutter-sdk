@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:notivera_flutter/notivera_flutter.dart';
 import 'package:notivera_flutter_example/home_screen.dart';
 import 'package:notivera_flutter_example/notivera_bootstrap.dart';
+import 'package:notivera_flutter_example/offline_ios_native_demo.dart';
 import 'package:notivera_flutter_example/offline_screen.dart';
 
 class DemoApp extends StatefulWidget {
@@ -50,6 +51,7 @@ class _DemoAppState extends State<DemoApp> {
     debugPrint('[NotiveraDemo] DemoApp._initialize() started');
     try {
       await initializeNotiveraDemo();
+      await OfflineIosNativeDemo.installDelegate();
       if (!mounted) {
         return;
       }

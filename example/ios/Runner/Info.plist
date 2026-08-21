@@ -28,6 +28,8 @@
 	<true/>
 	<key>NotiveraAppGroup</key>
 	<string>group.com.notivera.app</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Notivera uses your location for geofenced campaigns.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Notivera uses your location for geofenced campaigns.</string>
 	<key>UIBackgroundModes</key>

@@ -1,0 +1,56 @@
+{
+      "notification": {
+      "id":"77719c20-d38e-4cda-bfff-313cc11a15c8",
+      "title":"New Kit Launch",
+      "subTitle":"Tap for more info",
+      "description":null,
+      "message":"Checkout the 2023 Houston Dynamo kit now available",
+      "type":"VIDEO",
+      "metadata":null,
+      "clientMetadata":null,
+      "contents":[
+         {
+            "id":"421f20ee-04ae-46ce-aa14-aefb9dced942",
+            "name":"421f20ee-04ae-46ce-aa14-aefb9dced942.mp4",
+            "mediaType":"VIDEO",
+            "presentation":"DEFAULT",
+            "ttl":-1,
+            "downloadUrl":"Kit_Launch",
+            "width":1080,
+            "height":2280,
+            "defaultContent":false,
+            "options":{
+               "orientation":"portrait",
+               "zoomMode":"zoom",
+               "useEmbeddedPlayer":true,
+               "allowPreview":true,
+               "fullScreen":true,
+               "buttons":[{
+                  "displayName":"Button 1",
+                     "url":"https://www.mlsstore.com/houston-dynamo-fc/mens-houston-dynamo-fc-adidas-orange-2023-el-sol-authentic-jersey/t-36902469+p-5079411332901+z-9-3365209968?_ref=p-DLP:m-GRID:i-r0c0:po-0",
+                     "linkHandling":"defaultBrowser",
+                     "text":"BBC Link",
+                     "textColor":"#F9AF05",
+                     "font":"Arial",
+                     "fontSize":"41",
+                     "backgroundColor":"#A71680",
+                     "position":{
+                        "top":288,
+                        "left":210,
+                        "bottom":421,
+                        "right":703
+                     },
+                     "buttonAppear":2968,
+                     "buttonDisappear":7017,
+                     "fullScreen":false
+               }],
+               "allowSharing":false,
+               "allowScrubbing":false
+            }
+         }
+      ],
+      "ttl":604800,
+      "personalisation":{
+      }
+   }
+}

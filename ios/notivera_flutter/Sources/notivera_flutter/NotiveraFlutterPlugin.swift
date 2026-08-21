@@ -18,6 +18,10 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) -> Bool {
+    NSLog(
+      "[NotiveraFlutterPlugin] APNs device token received (%d bytes)",
+      deviceToken.count
+    )
     sdk?.application(
       application,
       didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
@@ -29,6 +33,10 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
   ) -> Bool {
+    NSLog(
+      "[NotiveraFlutterPlugin] APNs registration failed: %@",
+      error.localizedDescription
+    )
     sdk?.application(
       application,
       didFailToRegisterForRemoteNotificationsWithError: error,
@@ -53,6 +61,22 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     return true
   }
 
+  public func application(
+    _ application: UIApplication,
+    handleEventsForBackgroundURLSession identifier: String,
+    completionHandler: @escaping () -> Void
+  ) -> Bool {
+    guard let sdk else {
+      return false
+    }
+    sdk.application(
+      application,
+      handleEventsForBackgroundURLSession: identifier,
+      completionHandler: completionHandler
+    )
+    return true
+  }
+
   func initialize(config: NotiveraConfig) throws {
     let instance = Notivera(
       apiKey: config.apiKey,
@@ -62,7 +86,15 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     )
     instance.customerID = config.customerId
     sdk = instance
+    // Re-assert after Flutter/Firebase plugins may have claimed the center.
+    instance.setNotiveraUserNotificationDelegate(
+      delegate: NotiveraUserNotificationDelegate(sdk: instance)
+    )
     startObservingEvents()
+    NotificationCenter.default.post(
+      name: Notification.Name("NotiveraFlutterPluginDidInitialize"),
+      object: instance
+    )
   }
 
   func getDeviceId() throws -> String? {
@@ -159,6 +191,14 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
       do {
         let sdk = try self.requireSDK()
         await sdk.showAuthorisationPrompts()
+        // Authorization / Firebase can replace the notification center delegate.
+        sdk.setNotiveraUserNotificationDelegate(
+          delegate: NotiveraUserNotificationDelegate(sdk: sdk)
+        )
+        NotificationCenter.default.post(
+          name: Notification.Name("NotiveraFlutterPluginDidInitialize"),
+          object: sdk
+        )
         completion(.success(()))
       } catch {
         completion(.failure(error))
@@ -176,7 +216,27 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
 
   func handlePushMessage(data: [String: String]) throws {
     let sdk = try requireSDK()
-    let userInfo = Dictionary<AnyHashable, Any>(uniqueKeysWithValues: data.map { ($0.key, $0.value) })
+    if data["PSDKDemoNotification"] != nil {
+      throw PigeonError(
+        code: "unsupported-on-ios",
+        message:
+          "Offline demo payloads (PSDKDemoNotification) are Android-only. "
+          + "iOS offline demos use local UNNotifications in the native app, not the SDK push pipeline.",
+        details: data
+      )
+    }
+    let userInfo = Dictionary<AnyHashable, Any>(
+      uniqueKeysWithValues: data.map { ($0.key, $0.value as Any) }
+    )
+    guard sdk.isNotiveraNotification(userInfo: userInfo) else {
+      throw PigeonError(
+        code: "not-notivera-message",
+        message:
+          "Payload is not a Notivera iOS notification. Expected aps.category "
+          + "NSDKNotification or PushologiesCarouselNotification.",
+        details: data
+      )
+    }
     sdk.application(
       UIApplication.shared,
       didReceiveRemoteNotification: userInfo,

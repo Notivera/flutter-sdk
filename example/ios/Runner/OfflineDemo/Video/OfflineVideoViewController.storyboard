@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bgJ-Ou-EzN">
+    <device id="retina6_0" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Offline Video View Controller-->
+        <scene sceneID="IgW-EZ-lSr">
+            <objects>
+                <viewController modalPresentationStyle="fullScreen" id="bgJ-Ou-EzN" customClass="OfflineVideoViewController" customModule="PushDev" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" restorationIdentifier="PSDKPushPollViewController" id="WfD-ts-lQh">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zrM-7P-yK0">
+                                <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="8"/>
+                            </view>
+                            <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Zf-xr-Wd1">
+                                <rect key="frame" x="310" y="16" width="80" height="80"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="o5I-Ig-7Lg"/>
+                                    <constraint firstAttribute="height" constant="80" id="pb5-GG-TbE"/>
+                                </constraints>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <inset key="contentEdgeInsets" minX="27" minY="27" maxX="27" maxY="27"/>
+                                <state key="normal" image="closeButton"/>
+                                <connections>
+                                    <action selector="closeButtonTapped" destination="bgJ-Ou-EzN" eventType="touchUpInside" id="c4i-wK-mIW"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6jJ-CK-XgJ">
+                                <rect key="frame" x="72" y="674" width="246" height="120"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="dNV-4X-8kK"/>
+                                </constraints>
+                                <color key="tintColor" red="0.97647058819999999" green="0.68627450980000004" blue="0.019607843140000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="transparent_picture"/>
+                                <connections>
+                                    <action selector="customButtonTapped" destination="bgJ-Ou-EzN" eventType="touchUpInside" id="fgH-IA-rL0"/>
+                                </connections>
+                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Uca-Ls-maM">
+                                <rect key="frame" x="16" y="674" width="358" height="120"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mQl-l3-2BK">
+                                        <rect key="frame" x="0.0" y="0.0" width="179" height="120"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title=""/>
+                                        <connections>
+                                            <action selector="disagreeButtonTapped" destination="bgJ-Ou-EzN" eventType="touchUpInside" id="zdy-GG-3On"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MiI-cA-7Yb">
+                                        <rect key="frame" x="179" y="0.0" width="179" height="120"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title=""/>
+                                        <connections>
+                                            <action selector="agreeButtonTapped" destination="bgJ-Ou-EzN" eventType="touchUpInside" id="ezj-nm-xKX"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="LA9-GB-dDr"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="WRu-UX-EZG"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="zrM-7P-yK0" firstAttribute="top" secondItem="WfD-ts-lQh" secondAttribute="top" id="2zi-CA-ZR5"/>
+                            <constraint firstAttribute="bottom" secondItem="zrM-7P-yK0" secondAttribute="bottom" priority="500" id="GcX-fw-SPl"/>
+                            <constraint firstItem="WRu-UX-EZG" firstAttribute="bottom" secondItem="Uca-Ls-maM" secondAttribute="bottom" constant="16" id="MFc-KI-1om"/>
+                            <constraint firstItem="WRu-UX-EZG" firstAttribute="trailing" secondItem="2Zf-xr-Wd1" secondAttribute="trailing" id="N8R-sp-5uS"/>
+                            <constraint firstAttribute="trailing" secondItem="zrM-7P-yK0" secondAttribute="trailing" id="SnO-kR-usE"/>
+                            <constraint firstItem="WRu-UX-EZG" firstAttribute="bottom" secondItem="6jJ-CK-XgJ" secondAttribute="bottom" constant="16" id="Tna-5k-25l"/>
+                            <constraint firstItem="6jJ-CK-XgJ" firstAttribute="leading" secondItem="WRu-UX-EZG" secondAttribute="leading" constant="72" id="XqL-U9-Nha"/>
+                            <constraint firstItem="zrM-7P-yK0" firstAttribute="leading" secondItem="WfD-ts-lQh" secondAttribute="leading" id="ihW-zX-zM0"/>
+                            <constraint firstItem="2Zf-xr-Wd1" firstAttribute="top" secondItem="WfD-ts-lQh" secondAttribute="top" constant="16" id="itt-7i-CrI"/>
+                            <constraint firstItem="Uca-Ls-maM" firstAttribute="leading" secondItem="WRu-UX-EZG" secondAttribute="leading" constant="16" id="lnR-ho-lDN"/>
+                            <constraint firstItem="WRu-UX-EZG" firstAttribute="trailing" secondItem="6jJ-CK-XgJ" secondAttribute="trailing" constant="72" id="sJ3-UO-3TX"/>
+                            <constraint firstItem="WRu-UX-EZG" firstAttribute="trailing" secondItem="Uca-Ls-maM" secondAttribute="trailing" constant="16" id="ym8-Aw-EAG"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="vhU-jZ-pKE"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <connections>
+                        <outlet property="closeButton" destination="2Zf-xr-Wd1" id="ZzP-8u-LjX"/>
+                        <outlet property="customButton" destination="6jJ-CK-XgJ" id="Jt0-q8-L1C"/>
+                        <outlet property="pollButtonsStackView" destination="Uca-Ls-maM" id="opu-ar-GPZ"/>
+                        <outlet property="videoView" destination="zrM-7P-yK0" id="H95-q1-Mfj"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7xM-DM-xSI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="256.92307692307691" y="-267.29857819905214"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="closeButton" width="336" height="336"/>
+        <image name="transparent_picture" width="1920" height="1080"/>
+    </resources>
+</document>

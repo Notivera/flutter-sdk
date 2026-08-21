@@ -8,7 +8,6 @@ import 'package:notivera_flutter_example/notivera_bootstrap.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Must be registered before runApp (Android data messages in bg/terminated).
   if (Platform.isAndroid) {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }

@@ -1,0 +1,39 @@
+
+{
+    "notification": {
+    "id":"77719c20-d38e-4cda-bfff-313cc11a15c8",
+    "title":"Houston Starting XI",
+    "subTitle":"Tap for more info",
+    "description":null,
+    "message":"Have your say! Who do you think will win?",
+    "type":"VIDEO",
+    "metadata":null,
+    "clientMetadata":null,
+    "contents":[
+       {
+          "id":"421f20ee-04ae-46ce-aa14-aefb9dced942",
+          "name":"421f20ee-04ae-46ce-aa14-aefb9dced942.mp4",
+          "mediaType":"VIDEO",
+          "presentation":"DEFAULT",
+          "ttl":-1,
+          "downloadUrl":"Houston_Dynamo_Starting_XI_Main",
+          "width":1080,
+          "height":2280,
+          "defaultContent":false,
+          "options":{
+             "orientation":"portrait",
+             "zoomMode":"zoom",
+             "useEmbeddedPlayer":true,
+             "allowPreview":true,
+             "fullScreen":true,
+             "buttons":[],
+             "allowSharing":false,
+             "allowScrubbing":false
+          }
+       }
+    ],
+    "ttl":604800,
+    "personalisation":{
+    }
+ }
+}
