@@ -10,9 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-  List<Object?>? replyList,
-  String channelName, {
-  required bool isNullValid,
+    List<Object?>? replyList,
+    String channelName, {
+    required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -34,11 +34,8 @@ Object? _extractReplyValueOrThrow(
   return replyList.firstOrNull;
 }
 
-List<Object?> wrapResponse({
-  Object? result,
-  PlatformException? error,
-  bool empty = false,
-}) {
+
+List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -47,7 +44,6 @@ List<Object?> wrapResponse({
   }
   return <Object?>[error.code, error.message, error.details];
 }
-
 bool _deepEquals(Object? a, Object? b) {
   if (identical(a, b)) {
     return true;
@@ -60,9 +56,8 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed.every(
-          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
-        );
+        a.indexed
+            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -111,9 +106,79 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-enum ConnectionType { all, wifi, mobile, mobileRoaming, mobileNoRoaming }
 
-enum EventType { notificationTapped, videoClosed, inAppClosed, inAppCtaTapped }
+enum ConnectionType {
+  all,
+  wifi,
+  mobile,
+  mobileRoaming,
+  mobileNoRoaming,
+}
+
+enum EventType {
+  notificationTapped,
+  videoClosed,
+  inAppClosed,
+  inAppCtaTapped,
+}
+
+/// Android-only notification chrome for [NotiveraConfig.pushTheme].
+///
+/// Pass Android resource **names** (not Flutter asset paths), e.g. drawable /
+/// mipmap / color names from the host app `res/` folder. Resolved natively via
+/// `Resources.getIdentifier`. Ignored on iOS.
+class NotiveraPushTheme {
+  NotiveraPushTheme({
+    this.smallIcon,
+    this.largeIcon,
+    this.color,
+  });
+
+  /// Android drawable or mipmap resource name for the status-bar icon.
+  String? smallIcon;
+
+  /// Android drawable or mipmap resource name for the large notification icon.
+  String? largeIcon;
+
+  /// Android color resource name for the notification accent.
+  String? color;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      smallIcon,
+      largeIcon,
+      color,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static NotiveraPushTheme decode(Object result) {
+    result as List<Object?>;
+    return NotiveraPushTheme(
+      smallIcon: result[0] as String?,
+      largeIcon: result[1] as String?,
+      color: result[2] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! NotiveraPushTheme || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(smallIcon, other.smallIcon) && _deepEquals(largeIcon, other.largeIcon) && _deepEquals(color, other.color);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
 
 class NotiveraConfig {
   NotiveraConfig({
@@ -127,6 +192,7 @@ class NotiveraConfig {
     this.trackLocation,
     this.enableGeofence,
     this.downloadConnectionType,
+    this.pushTheme,
   });
 
   String apiKey;
@@ -149,6 +215,9 @@ class NotiveraConfig {
 
   ConnectionType? downloadConnectionType;
 
+  /// Android-only. Maps to native `NotiveraPushTheme` resource IDs.
+  NotiveraPushTheme? pushTheme;
+
   List<Object?> _toList() {
     return <Object?>[
       apiKey,
@@ -161,12 +230,12 @@ class NotiveraConfig {
       trackLocation,
       enableGeofence,
       downloadConnectionType,
+      pushTheme,
     ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static NotiveraConfig decode(Object result) {
     result as List<Object?>;
@@ -181,6 +250,7 @@ class NotiveraConfig {
       trackLocation: result[7] as bool?,
       enableGeofence: result[8] as bool?,
       downloadConnectionType: result[9] as ConnectionType?,
+      pushTheme: result[10] as NotiveraPushTheme?,
     );
   }
 
@@ -193,16 +263,7 @@ class NotiveraConfig {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(apiKey, other.apiKey) &&
-        _deepEquals(apiSecret, other.apiSecret) &&
-        _deepEquals(appVersion, other.appVersion) &&
-        _deepEquals(tenantId, other.tenantId) &&
-        _deepEquals(customerId, other.customerId) &&
-        _deepEquals(inAppOpenDelayMs, other.inAppOpenDelayMs) &&
-        _deepEquals(enableDebug, other.enableDebug) &&
-        _deepEquals(trackLocation, other.trackLocation) &&
-        _deepEquals(enableGeofence, other.enableGeofence) &&
-        _deepEquals(downloadConnectionType, other.downloadConnectionType);
+    return _deepEquals(apiKey, other.apiKey) && _deepEquals(apiSecret, other.apiSecret) && _deepEquals(appVersion, other.appVersion) && _deepEquals(tenantId, other.tenantId) && _deepEquals(customerId, other.customerId) && _deepEquals(inAppOpenDelayMs, other.inAppOpenDelayMs) && _deepEquals(enableDebug, other.enableDebug) && _deepEquals(trackLocation, other.trackLocation) && _deepEquals(enableGeofence, other.enableGeofence) && _deepEquals(downloadConnectionType, other.downloadConnectionType) && _deepEquals(pushTheme, other.pushTheme);
   }
 
   @override
@@ -211,19 +272,24 @@ class NotiveraConfig {
 }
 
 class PersonalisationEntry {
-  PersonalisationEntry({required this.name, this.value});
+  PersonalisationEntry({
+    required this.name,
+    this.value,
+  });
 
   String name;
 
   String? value;
 
   List<Object?> _toList() {
-    return <Object?>[name, value];
+    return <Object?>[
+      name,
+      value,
+    ];
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static PersonalisationEntry decode(Object result) {
     result as List<Object?>;
@@ -296,8 +362,7 @@ class PushEvent {
   }
 
   Object encode() {
-    return _toList();
-  }
+    return _toList();  }
 
   static PushEvent decode(Object result) {
     result as List<Object?>;
@@ -323,21 +388,14 @@ class PushEvent {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(id, other.id) &&
-        _deepEquals(eventType, other.eventType) &&
-        _deepEquals(title, other.title) &&
-        _deepEquals(description, other.description) &&
-        _deepEquals(replacements, other.replacements) &&
-        _deepEquals(message, other.message) &&
-        _deepEquals(clientMetadata, other.clientMetadata) &&
-        _deepEquals(type, other.type) &&
-        _deepEquals(targetUrl, other.targetUrl);
+    return _deepEquals(id, other.id) && _deepEquals(eventType, other.eventType) && _deepEquals(title, other.title) && _deepEquals(description, other.description) && _deepEquals(replacements, other.replacements) && _deepEquals(message, other.message) && _deepEquals(clientMetadata, other.clientMetadata) && _deepEquals(type, other.type) && _deepEquals(targetUrl, other.targetUrl);
   }
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
+
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -346,20 +404,23 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    } else if (value is ConnectionType) {
+    }    else if (value is ConnectionType) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    } else if (value is EventType) {
+    }    else if (value is EventType) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    } else if (value is NotiveraConfig) {
+    }    else if (value is NotiveraPushTheme) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is PersonalisationEntry) {
+    }    else if (value is NotiveraConfig) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is PushEvent) {
+    }    else if (value is PersonalisationEntry) {
       buffer.putUint8(133);
+      writeValue(buffer, value.encode());
+    }    else if (value is PushEvent) {
+      buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -376,10 +437,12 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : EventType.values[value];
       case 131:
-        return NotiveraConfig.decode(readValue(buffer)!);
+        return NotiveraPushTheme.decode(readValue(buffer)!);
       case 132:
-        return PersonalisationEntry.decode(readValue(buffer)!);
+        return NotiveraConfig.decode(readValue(buffer)!);
       case 133:
+        return PersonalisationEntry.decode(readValue(buffer)!);
+      case 134:
         return PushEvent.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -391,13 +454,9 @@ class NotiveraHostApi {
   /// Constructor for [NotiveraHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  NotiveraHostApi({
-    BinaryMessenger? binaryMessenger,
-    String messageChannelSuffix = '',
-  }) : pigeonVar_binaryMessenger = binaryMessenger,
-       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
-           ? '.$messageChannelSuffix'
-           : '';
+  NotiveraHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -405,28 +464,25 @@ class NotiveraHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<void> initialize(NotiveraConfig config) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.initialize$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.initialize$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[config],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[config]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<String?> getDeviceId() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getDeviceId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getDeviceId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -436,16 +492,16 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   Future<String?> getCustomerId() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getCustomerId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getCustomerId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -455,36 +511,34 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   Future<void> setCustomerId(String customerId) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.setCustomerId$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.setCustomerId$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[customerId],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[customerId]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<String?> getSdkVersion() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getSdkVersion$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getSdkVersion$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -494,81 +548,73 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
     return pigeonVar_replyValue as String?;
   }
 
   Future<String> subscribeTag(String tag) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.subscribeTag$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.subscribeTag$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[tag],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[tag]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as String;
   }
 
   Future<String> unsubscribeTag(String tag) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.unsubscribeTag$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.unsubscribeTag$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[tag],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[tag]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as String;
   }
 
-  Future<String> updatePersonalisationVariables(
-    List<PersonalisationEntry> entries,
-  ) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.updatePersonalisationVariables$pigeonVar_messageChannelSuffix';
+  Future<String> updatePersonalisationVariables(List<PersonalisationEntry> entries) async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.updatePersonalisationVariables$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[entries],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[entries]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as String;
   }
 
   Future<List<PersonalisationEntry>> getAllPersonalisations() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getAllPersonalisations$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.getAllPersonalisations$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -578,38 +624,35 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
-    return (pigeonVar_replyValue! as List<Object?>)
-        .cast<PersonalisationEntry>();
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return (pigeonVar_replyValue! as List<Object?>).cast<PersonalisationEntry>();
   }
 
   Future<String> showInAppNotification(String customIdentifier) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.showInAppNotification$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.showInAppNotification$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[customIdentifier],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[customIdentifier]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as String;
   }
 
   Future<void> closeNotificationView() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.closeNotificationView$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.closeNotificationView$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -619,15 +662,15 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> requestAuthorisationPrompts() async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.requestAuthorisationPrompts$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.requestAuthorisationPrompts$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -637,71 +680,66 @@ class NotiveraHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<void> setPushToken(String token) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.setPushToken$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.setPushToken$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[token],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[token]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 
   Future<bool> isNotiveraMessage(Map<String, String> data) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.isNotiveraMessage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.isNotiveraMessage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[data],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
     return pigeonVar_replyValue! as bool;
   }
 
   Future<void> handlePushMessage(Map<String, String> data) async {
-    final pigeonVar_channelName =
-        'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.handlePushMessage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.notivera_flutter.NotiveraHostApi.handlePushMessage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[data],
-    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[data]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
   }
 }
 
@@ -710,20 +748,12 @@ abstract class NotiveraFlutterApi {
 
   void onPushEvent(PushEvent event);
 
-  static void setUp(
-    NotiveraFlutterApi? api, {
-    BinaryMessenger? binaryMessenger,
-    String messageChannelSuffix = '',
-  }) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty
-        ? '.$messageChannelSuffix'
-        : '';
+  static void setUp(NotiveraFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.notivera_flutter.NotiveraFlutterApi.onPushEvent$messageChannelSuffix',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
+          'dev.flutter.pigeon.notivera_flutter.NotiveraFlutterApi.onPushEvent$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -735,10 +765,8 @@ abstract class NotiveraFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }

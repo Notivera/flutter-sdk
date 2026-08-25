@@ -2,11 +2,13 @@ package com.notivera.notivera_flutter
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.Observer
 import com.notivera.sdk.SDK
 import com.notivera.sdk.SDKConfig
 import com.notivera.sdk.SDKResponse
+import com.notivera.sdk.NotiveraPushTheme as SdkNotiveraPushTheme
 import com.notivera.sdk.ConnectionType as SdkConnectionType
 import com.notivera.sdk.business.data.EventType as SdkEventType
 import com.notivera.sdk.business.data.PushEvent as SdkPushEvent
@@ -63,7 +65,8 @@ class NotiveraFlutterPlugin :
         val app =
             application
                 ?: throw FlutterError("no-application", "Flutter engine is not attached.", null)
-        SDK.init(app, config.toSdk())
+        // pushTheme is Android-only (ignored on iOS). Resource names resolve to R.drawable/mipmap/color.
+        SDK.init(app, config.toSdk(), config.toPushTheme(app))
         initialized = true
         ensureEventObserver()
     }
@@ -409,6 +412,58 @@ private fun NotiveraConfig.toSdk(): SDKConfig =
         enableGeofence = enableGeofence ?: false,
         inAppOpenDelay = inAppOpenDelayMs,
     )
+
+/**
+ * Maps Flutter [NotiveraPushTheme] resource **names** to Android `@DrawableRes` /
+ * `@ColorRes` IDs for the native SDK. Missing names fall back to SDK defaults.
+ */
+private fun NotiveraConfig.toPushTheme(context: Context): SdkNotiveraPushTheme {
+    val defaults = SdkNotiveraPushTheme()
+    val theme = pushTheme ?: return defaults
+    return SdkNotiveraPushTheme(
+        smallIconRes =
+            context.resolveDrawableOrMipmap(theme.smallIcon)
+                ?: defaults.smallIconRes.also {
+                    if (!theme.smallIcon.isNullOrBlank()) {
+                        Log.w("NotiveraFlutterPlugin", "pushTheme.smallIcon '${theme.smallIcon}' not found; using SDK default")
+                    }
+                },
+        largeIconRes =
+            context.resolveDrawableOrMipmap(theme.largeIcon)
+                ?: defaults.largeIconRes.also {
+                    if (!theme.largeIcon.isNullOrBlank()) {
+                        Log.w("NotiveraFlutterPlugin", "pushTheme.largeIcon '${theme.largeIcon}' not found; using SDK default")
+                    }
+                },
+        color =
+            context.resolveColorRes(theme.color)
+                ?: defaults.color.also {
+                    if (!theme.color.isNullOrBlank()) {
+                        Log.w("NotiveraFlutterPlugin", "pushTheme.color '${theme.color}' not found; using SDK default")
+                    }
+                },
+    )
+}
+
+private fun Context.resolveDrawableOrMipmap(name: String?): Int? {
+    if (name.isNullOrBlank()) {
+        return null
+    }
+    val drawable = resources.getIdentifier(name, "drawable", packageName)
+    if (drawable != 0) {
+        return drawable
+    }
+    val mipmap = resources.getIdentifier(name, "mipmap", packageName)
+    return mipmap.takeIf { it != 0 }
+}
+
+private fun Context.resolveColorRes(name: String?): Int? {
+    if (name.isNullOrBlank()) {
+        return null
+    }
+    val color = resources.getIdentifier(name, "color", packageName)
+    return color.takeIf { it != 0 }
+}
 
 private fun ConnectionType?.toSdk(): SdkConnectionType =
     when (this) {

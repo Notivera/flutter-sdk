@@ -78,6 +78,8 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
   }
 
   func initialize(config: NotiveraConfig) throws {
+    // config.pushTheme is Android-only (resource names → NotiveraPushTheme).
+    // The iOS SDK has no theme parameter on init; icons come from the app bundle.
     let instance = Notivera(
       apiKey: config.apiKey,
       apiSecret: config.apiSecret,

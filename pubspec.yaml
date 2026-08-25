@@ -1,6 +1,6 @@
 name: notivera_flutter
 description: Flutter plugin wrapping the Notivera native Android and iOS SDKs.
-version: 0.0.1
+version: 5.0.1
 homepage: https://github.com/Notivera/flutter_sdk
 repository: https://github.com/Notivera/flutter_sdk
 issue_tracker: https://github.com/Notivera/flutter_sdk/issues

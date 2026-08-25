@@ -222,6 +222,59 @@ enum class EventType(val raw: Int) {
   }
 }
 
+/**
+ * Android-only notification chrome for [NotiveraConfig.pushTheme].
+ *
+ * Pass Android resource **names** (not Flutter asset paths), e.g. drawable /
+ * mipmap / color names from the host app `res/` folder. Resolved natively via
+ * `Resources.getIdentifier`. Ignored on iOS.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class NotiveraPushTheme (
+  /** Android drawable or mipmap resource name for the status-bar icon. */
+  val smallIcon: String? = null,
+  /** Android drawable or mipmap resource name for the large notification icon. */
+  val largeIcon: String? = null,
+  /** Android color resource name for the notification accent. */
+  val color: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): NotiveraPushTheme {
+      val smallIcon = pigeonVar_list[0] as String?
+      val largeIcon = pigeonVar_list[1] as String?
+      val color = pigeonVar_list[2] as String?
+      return NotiveraPushTheme(smallIcon, largeIcon, color)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      smallIcon,
+      largeIcon,
+      color,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as NotiveraPushTheme
+    return MessagesPigeonUtils.deepEquals(this.smallIcon, other.smallIcon) && MessagesPigeonUtils.deepEquals(this.largeIcon, other.largeIcon) && MessagesPigeonUtils.deepEquals(this.color, other.color)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.smallIcon)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.largeIcon)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.color)
+    return result
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class NotiveraConfig (
   val apiKey: String,
@@ -233,7 +286,9 @@ data class NotiveraConfig (
   val enableDebug: Boolean? = null,
   val trackLocation: Boolean? = null,
   val enableGeofence: Boolean? = null,
-  val downloadConnectionType: ConnectionType? = null
+  val downloadConnectionType: ConnectionType? = null,
+  /** Android-only. Maps to native `NotiveraPushTheme` resource IDs. */
+  val pushTheme: NotiveraPushTheme? = null
 )
  {
   companion object {
@@ -248,7 +303,8 @@ data class NotiveraConfig (
       val trackLocation = pigeonVar_list[7] as Boolean?
       val enableGeofence = pigeonVar_list[8] as Boolean?
       val downloadConnectionType = pigeonVar_list[9] as ConnectionType?
-      return NotiveraConfig(apiKey, apiSecret, appVersion, tenantId, customerId, inAppOpenDelayMs, enableDebug, trackLocation, enableGeofence, downloadConnectionType)
+      val pushTheme = pigeonVar_list[10] as NotiveraPushTheme?
+      return NotiveraConfig(apiKey, apiSecret, appVersion, tenantId, customerId, inAppOpenDelayMs, enableDebug, trackLocation, enableGeofence, downloadConnectionType, pushTheme)
     }
   }
   fun toList(): List<Any?> {
@@ -263,6 +319,7 @@ data class NotiveraConfig (
       trackLocation,
       enableGeofence,
       downloadConnectionType,
+      pushTheme,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -273,7 +330,7 @@ data class NotiveraConfig (
       return true
     }
     val other = other as NotiveraConfig
-    return MessagesPigeonUtils.deepEquals(this.apiKey, other.apiKey) && MessagesPigeonUtils.deepEquals(this.apiSecret, other.apiSecret) && MessagesPigeonUtils.deepEquals(this.appVersion, other.appVersion) && MessagesPigeonUtils.deepEquals(this.tenantId, other.tenantId) && MessagesPigeonUtils.deepEquals(this.customerId, other.customerId) && MessagesPigeonUtils.deepEquals(this.inAppOpenDelayMs, other.inAppOpenDelayMs) && MessagesPigeonUtils.deepEquals(this.enableDebug, other.enableDebug) && MessagesPigeonUtils.deepEquals(this.trackLocation, other.trackLocation) && MessagesPigeonUtils.deepEquals(this.enableGeofence, other.enableGeofence) && MessagesPigeonUtils.deepEquals(this.downloadConnectionType, other.downloadConnectionType)
+    return MessagesPigeonUtils.deepEquals(this.apiKey, other.apiKey) && MessagesPigeonUtils.deepEquals(this.apiSecret, other.apiSecret) && MessagesPigeonUtils.deepEquals(this.appVersion, other.appVersion) && MessagesPigeonUtils.deepEquals(this.tenantId, other.tenantId) && MessagesPigeonUtils.deepEquals(this.customerId, other.customerId) && MessagesPigeonUtils.deepEquals(this.inAppOpenDelayMs, other.inAppOpenDelayMs) && MessagesPigeonUtils.deepEquals(this.enableDebug, other.enableDebug) && MessagesPigeonUtils.deepEquals(this.trackLocation, other.trackLocation) && MessagesPigeonUtils.deepEquals(this.enableGeofence, other.enableGeofence) && MessagesPigeonUtils.deepEquals(this.downloadConnectionType, other.downloadConnectionType) && MessagesPigeonUtils.deepEquals(this.pushTheme, other.pushTheme)
   }
 
   override fun hashCode(): Int {
@@ -288,6 +345,7 @@ data class NotiveraConfig (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.trackLocation)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.enableGeofence)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.downloadConnectionType)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.pushTheme)
     return result
   }
 }
@@ -410,15 +468,20 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          NotiveraConfig.fromList(it)
+          NotiveraPushTheme.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PersonalisationEntry.fromList(it)
+          NotiveraConfig.fromList(it)
         }
       }
       133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          PersonalisationEntry.fromList(it)
+        }
+      }
+      134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           PushEvent.fromList(it)
         }
@@ -436,16 +499,20 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.raw.toLong())
       }
-      is NotiveraConfig -> {
+      is NotiveraPushTheme -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is PersonalisationEntry -> {
+      is NotiveraConfig -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is PushEvent -> {
+      is PersonalisationEntry -> {
         stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is PushEvent -> {
+        stream.write(134)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

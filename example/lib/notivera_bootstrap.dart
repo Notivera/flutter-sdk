@@ -23,6 +23,13 @@ const NotiveraConfig demoNotiveraConfig = NotiveraConfig(
   enableGeofence: true,
   downloadConnectionType: ConnectionType.wifi,
   inAppOpenDelayMs: 5000,
+  // Android-only: adaptive launcher resources under res/mipmap + values.
+  // Ignored on iOS (home-screen icon is AppIcon in Assets.xcassets).
+  pushTheme: NotiveraPushTheme(
+    smallIcon: 'ic_launcher_foreground',
+    largeIcon: 'ic_launcher_round',
+    color: 'ic_launcher_background',
+  ),
 );
 
 bool _pushConfigured = false;

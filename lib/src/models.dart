@@ -5,6 +5,38 @@ enum ConnectionType { all, wifi, mobile, mobileRoaming, mobileNoRoaming }
 /// Native SDK event delivered to Dart after [Notivera.initialize].
 enum EventType { notificationTapped, videoClosed, inAppClosed, inAppCtaTapped }
 
+/// Android-only notification icons/color for [NotiveraConfig.pushTheme].
+///
+/// Pass **Android resource names** from the host app `res/` (drawable, mipmap,
+/// or color) — not Flutter asset paths and not `R.drawable` ints.
+///
+/// Example:
+/// ```dart
+/// NotiveraPushTheme(
+///   smallIcon: 'ic_launcher',
+///   largeIcon: 'ic_launcher',
+///   color: 'notification_accent',
+/// )
+/// ```
+///
+/// Ignored on iOS (no equivalent on the native iOS SDK init).
+class NotiveraPushTheme {
+  const NotiveraPushTheme({
+    this.smallIcon,
+    this.largeIcon,
+    this.color,
+  });
+
+  /// Android drawable or mipmap name used as the status-bar / small icon.
+  final String? smallIcon;
+
+  /// Android drawable or mipmap name used as the large notification icon.
+  final String? largeIcon;
+
+  /// Android color resource name used as the notification accent.
+  final String? color;
+}
+
 /// Credentials and options forwarded to the native Notivera SDKs.
 class NotiveraConfig {
   const NotiveraConfig({
@@ -18,6 +50,7 @@ class NotiveraConfig {
     this.trackLocation,
     this.enableGeofence,
     this.downloadConnectionType,
+    this.pushTheme,
   });
 
   final String apiKey;
@@ -38,6 +71,11 @@ class NotiveraConfig {
 
   /// Android-only. Restricts content downloads to a connection type.
   final ConnectionType? downloadConnectionType;
+
+  /// Android-only. Notification small/large icons and accent color.
+  ///
+  /// See [NotiveraPushTheme]. Has no effect on iOS.
+  final NotiveraPushTheme? pushTheme;
 }
 
 /// A personalisation schema name/value pair.

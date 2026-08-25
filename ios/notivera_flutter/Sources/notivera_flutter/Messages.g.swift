@@ -193,6 +193,56 @@ enum EventType: Int {
   case inAppCtaTapped = 3
 }
 
+/// Android-only notification chrome for [NotiveraConfig.pushTheme].
+///
+/// Pass Android resource **names** (not Flutter asset paths), e.g. drawable /
+/// mipmap / color names from the host app `res/` folder. Resolved natively via
+/// `Resources.getIdentifier`. Ignored on iOS.
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct NotiveraPushTheme: Hashable {
+  /// Android drawable or mipmap resource name for the status-bar icon.
+  var smallIcon: String? = nil
+  /// Android drawable or mipmap resource name for the large notification icon.
+  var largeIcon: String? = nil
+  /// Android color resource name for the notification accent.
+  var color: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> NotiveraPushTheme? {
+    let smallIcon: String? = nilOrValue(pigeonVar_list[0])
+    let largeIcon: String? = nilOrValue(pigeonVar_list[1])
+    let color: String? = nilOrValue(pigeonVar_list[2])
+
+    return NotiveraPushTheme(
+      smallIcon: smallIcon,
+      largeIcon: largeIcon,
+      color: color
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      smallIcon,
+      largeIcon,
+      color,
+    ]
+  }
+  static func == (lhs: NotiveraPushTheme, rhs: NotiveraPushTheme) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.smallIcon, rhs.smallIcon) && deepEqualsMessages(lhs.largeIcon, rhs.largeIcon) && deepEqualsMessages(lhs.color, rhs.color)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("NotiveraPushTheme")
+    deepHashMessages(value: smallIcon, hasher: &hasher)
+    deepHashMessages(value: largeIcon, hasher: &hasher)
+    deepHashMessages(value: color, hasher: &hasher)
+  }
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct NotiveraConfig: Hashable {
   var apiKey: String
@@ -205,6 +255,8 @@ struct NotiveraConfig: Hashable {
   var trackLocation: Bool? = nil
   var enableGeofence: Bool? = nil
   var downloadConnectionType: ConnectionType? = nil
+  /// Android-only. Maps to native `NotiveraPushTheme` resource IDs.
+  var pushTheme: NotiveraPushTheme? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -219,6 +271,7 @@ struct NotiveraConfig: Hashable {
     let trackLocation: Bool? = nilOrValue(pigeonVar_list[7])
     let enableGeofence: Bool? = nilOrValue(pigeonVar_list[8])
     let downloadConnectionType: ConnectionType? = nilOrValue(pigeonVar_list[9])
+    let pushTheme: NotiveraPushTheme? = nilOrValue(pigeonVar_list[10])
 
     return NotiveraConfig(
       apiKey: apiKey,
@@ -230,7 +283,8 @@ struct NotiveraConfig: Hashable {
       enableDebug: enableDebug,
       trackLocation: trackLocation,
       enableGeofence: enableGeofence,
-      downloadConnectionType: downloadConnectionType
+      downloadConnectionType: downloadConnectionType,
+      pushTheme: pushTheme
     )
   }
   func toList() -> [Any?] {
@@ -245,13 +299,14 @@ struct NotiveraConfig: Hashable {
       trackLocation,
       enableGeofence,
       downloadConnectionType,
+      pushTheme,
     ]
   }
   static func == (lhs: NotiveraConfig, rhs: NotiveraConfig) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return deepEqualsMessages(lhs.apiKey, rhs.apiKey) && deepEqualsMessages(lhs.apiSecret, rhs.apiSecret) && deepEqualsMessages(lhs.appVersion, rhs.appVersion) && deepEqualsMessages(lhs.tenantId, rhs.tenantId) && deepEqualsMessages(lhs.customerId, rhs.customerId) && deepEqualsMessages(lhs.inAppOpenDelayMs, rhs.inAppOpenDelayMs) && deepEqualsMessages(lhs.enableDebug, rhs.enableDebug) && deepEqualsMessages(lhs.trackLocation, rhs.trackLocation) && deepEqualsMessages(lhs.enableGeofence, rhs.enableGeofence) && deepEqualsMessages(lhs.downloadConnectionType, rhs.downloadConnectionType)
+    return deepEqualsMessages(lhs.apiKey, rhs.apiKey) && deepEqualsMessages(lhs.apiSecret, rhs.apiSecret) && deepEqualsMessages(lhs.appVersion, rhs.appVersion) && deepEqualsMessages(lhs.tenantId, rhs.tenantId) && deepEqualsMessages(lhs.customerId, rhs.customerId) && deepEqualsMessages(lhs.inAppOpenDelayMs, rhs.inAppOpenDelayMs) && deepEqualsMessages(lhs.enableDebug, rhs.enableDebug) && deepEqualsMessages(lhs.trackLocation, rhs.trackLocation) && deepEqualsMessages(lhs.enableGeofence, rhs.enableGeofence) && deepEqualsMessages(lhs.downloadConnectionType, rhs.downloadConnectionType) && deepEqualsMessages(lhs.pushTheme, rhs.pushTheme)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -266,6 +321,7 @@ struct NotiveraConfig: Hashable {
     deepHashMessages(value: trackLocation, hasher: &hasher)
     deepHashMessages(value: enableGeofence, hasher: &hasher)
     deepHashMessages(value: downloadConnectionType, hasher: &hasher)
+    deepHashMessages(value: pushTheme, hasher: &hasher)
   }
 }
 
@@ -392,10 +448,12 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 131:
-      return NotiveraConfig.fromList(self.readValue() as! [Any?])
+      return NotiveraPushTheme.fromList(self.readValue() as! [Any?])
     case 132:
-      return PersonalisationEntry.fromList(self.readValue() as! [Any?])
+      return NotiveraConfig.fromList(self.readValue() as! [Any?])
     case 133:
+      return PersonalisationEntry.fromList(self.readValue() as! [Any?])
+    case 134:
       return PushEvent.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -411,14 +469,17 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? EventType {
       super.writeByte(130)
       super.writeValue(value.rawValue)
-    } else if let value = value as? NotiveraConfig {
+    } else if let value = value as? NotiveraPushTheme {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? PersonalisationEntry {
+    } else if let value = value as? NotiveraConfig {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? PushEvent {
+    } else if let value = value as? PersonalisationEntry {
       super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? PushEvent {
+      super.writeByte(134)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

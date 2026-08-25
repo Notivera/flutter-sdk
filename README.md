@@ -33,6 +33,12 @@ Future<void> startNotivera() async {
       apiSecret: 'YOUR_API_SECRET',
       appVersion: '1.0.0',
       tenantId: 'YOUR_TENANT_ID',
+      // Android-only: host app res/drawable|mipmap|color names (not Flutter assets).
+      pushTheme: NotiveraPushTheme(
+        smallIcon: 'ic_launcher_foreground',
+        largeIcon: 'ic_launcher_round',
+        color: 'ic_launcher_background',
+      ),
     ),
   );
 
@@ -72,7 +78,9 @@ if (await Notivera.instance.isNotiveraMessage(data)) {
 }
 ```
 
-4. Request `POST_NOTIFICATIONS` on Android 13+ in your app if you show notifications.
+4. Optional Android notification chrome via [NotiveraConfig.pushTheme] — pass **resource names** from your app `res/` (e.g. `ic_launcher_foreground`, `ic_launcher_round`, `ic_launcher_background`). Ignored on iOS (use the Runner `AppIcon` asset instead).
+
+5. Request `POST_NOTIFICATIONS` on Android 13+ in your app if you show notifications.
 
 ## iOS host-app setup
 

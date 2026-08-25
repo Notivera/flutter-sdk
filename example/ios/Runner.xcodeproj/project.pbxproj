@@ -131,16 +131,16 @@
 		1CFFE8D664FAAB0A97081622 /* OfflineDemoNotificationDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineDemoNotificationDelegate.swift; sourceTree = "<group>"; };
 		263587AD7D35F1DF86B2F279 /* NotificationServiceExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationServiceExtension.swift; sourceTree = "<group>"; };
 		272B5658F426E07EE0EF3A20 /* OfflineCarouselNotificationContentCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; path = OfflineCarouselNotificationContentCell.xib; sourceTree = "<group>"; };
-		27FA149072524C010F8C1ECA /* OfflineVideoWithButtonOne.json */ = {isa = PBXFileReference; includeInIndex = 1; path = OfflineVideoWithButtonOne.json; sourceTree = "<group>"; };
+		27FA149072524C010F8C1ECA /* OfflineVideoWithButtonOne.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = OfflineVideoWithButtonOne.json; sourceTree = "<group>"; };
 		2EFEAC955F62DE5913156501 /* OfflineCarouselViewController.storyboard */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.storyboard; path = OfflineCarouselViewController.storyboard; sourceTree = "<group>"; };
 		2FA03D0D8F85D527842FA8F6 /* OfflineVideoViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineVideoViewModel.swift; sourceTree = "<group>"; };
 		31C55C9EB424130CB4252388 /* NotiveraContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotiveraContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3583544DD9DE3E70D6BA273C /* OfflineVideoWithButtonTwo.json */ = {isa = PBXFileReference; includeInIndex = 1; path = OfflineVideoWithButtonTwo.json; sourceTree = "<group>"; };
+		3583544DD9DE3E70D6BA273C /* OfflineVideoWithButtonTwo.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = OfflineVideoWithButtonTwo.json; sourceTree = "<group>"; };
 		36A5E5ED44AA6BFF533885C9 /* OfflinePosition.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflinePosition.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
-		512A6DFB9F2FEB5714F92780 /* Kit_Launch.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; path = Kit_Launch.mp4; sourceTree = "<group>"; };
+		512A6DFB9F2FEB5714F92780 /* Kit_Launch.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; path = Kit_Launch.mp4; sourceTree = "<group>"; };
 		52A33D5731528D6027BD558E /* IdentifiableByTypeName.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdentifiableByTypeName.swift; sourceTree = "<group>"; };
 		65C6DCCEAFEF2EB76EA6EDB9 /* OfflineVideoViewController.storyboard */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.storyboard; path = OfflineVideoViewController.storyboard; sourceTree = "<group>"; };
 		681E559B44E6020C06408F82 /* PSDKDefaultBG.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = PSDKDefaultBG.png; sourceTree = "<group>"; };
@@ -157,7 +157,7 @@
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		82F982EA75C691B206BF28C0 /* Unsafely.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Unsafely.swift; sourceTree = "<group>"; };
-		84A1C95338F350985120D63D /* Houston_Dynamo_Starting_XI_Main.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; path = Houston_Dynamo_Starting_XI_Main.mp4; sourceTree = "<group>"; };
+		84A1C95338F350985120D63D /* Houston_Dynamo_Starting_XI_Main.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; path = Houston_Dynamo_Starting_XI_Main.mp4; sourceTree = "<group>"; };
 		8B4B2C0005D17ED427CD9815 /* OfflineDemoPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineDemoPlugin.swift; sourceTree = "<group>"; };
 		918CB2198BD349B3FB89A23A /* OfflineCarouselNotificationContentViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineCarouselNotificationContentViewModel.swift; sourceTree = "<group>"; };
 		92A78B6697A4DEDBCCA7CA46 /* UIViewController+LoadableFromStoryboard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIViewController+LoadableFromStoryboard.swift"; sourceTree = "<group>"; };
@@ -174,7 +174,7 @@
 		A10B17190A9037210ECC878C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A64B016A8673151A0BC34890 /* NotiveraServiceExtension.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = NotiveraServiceExtension.entitlements; sourceTree = "<group>"; };
 		AA299028E7C551446AF9C346 /* OfflineNotiveraScalingCarouselLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineNotiveraScalingCarouselLayout.swift; sourceTree = "<group>"; };
-		AA6F50C3CFBCA08BD702374F /* OfflineVideoWithNoButtons.json */ = {isa = PBXFileReference; includeInIndex = 1; path = OfflineVideoWithNoButtons.json; sourceTree = "<group>"; };
+		AA6F50C3CFBCA08BD702374F /* OfflineVideoWithNoButtons.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = OfflineVideoWithNoButtons.json; sourceTree = "<group>"; };
 		B11853C71F31EC7A7091E157 /* ReuseableCollectionCellBasedOnTypeDequeueing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReuseableCollectionCellBasedOnTypeDequeueing.swift; sourceTree = "<group>"; };
 		B216698B98898DC874D627D7 /* OfflineContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineContent.swift; sourceTree = "<group>"; };
 		B6BBBA3D4A669214AF32F47A /* AMP_Image_5.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = AMP_Image_5.png; sourceTree = "<group>"; };
@@ -187,10 +187,10 @@
 		CD6934287531BA2DF28372D2 /* VideoViewState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VideoViewState.swift; sourceTree = "<group>"; };
 		D18A65A664A170C9C9D499C6 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1E10C86383689EAFA96B446 /* LoadableFromStoryboard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadableFromStoryboard.swift; sourceTree = "<group>"; };
-		D2A10937530E8EABF1A0D710 /* OfflineCarouselTiles.json */ = {isa = PBXFileReference; includeInIndex = 1; path = OfflineCarouselTiles.json; sourceTree = "<group>"; };
+		D2A10937530E8EABF1A0D710 /* OfflineCarouselTiles.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = OfflineCarouselTiles.json; sourceTree = "<group>"; };
 		D36AC10050BA6BFCC23BE37F /* UIView+NibRepresentable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIView+NibRepresentable.swift"; sourceTree = "<group>"; };
 		D44953D3609D4D6751413C99 /* OfflineCarouselNotificationContentCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineCarouselNotificationContentCell.swift; sourceTree = "<group>"; };
-		D5C14F030707F2A195810DDF /* HoustonDynamos_Goal.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; path = HoustonDynamos_Goal.mp4; sourceTree = "<group>"; };
+		D5C14F030707F2A195810DDF /* HoustonDynamos_Goal.mp4 */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; path = HoustonDynamos_Goal.mp4; sourceTree = "<group>"; };
 		D90A97AA2ED9528610C619FD /* OfflineVideoViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineVideoViewController.swift; sourceTree = "<group>"; };
 		DD8D32BA689ADC49C4C0DA6E /* OfflineNotificationType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineNotificationType.swift; sourceTree = "<group>"; };
 		F0A5562B8A3E25D6658669BB /* AMP_Image_2.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = AMP_Image_2.png; sourceTree = "<group>"; };
@@ -245,7 +245,6 @@
 				B11853C71F31EC7A7091E157 /* ReuseableCollectionCellBasedOnTypeDequeueing.swift */,
 				11CE82F339B90259D530A50A /* NibLoadable.swift */,
 			);
-			name = Abstract;
 			path = Abstract;
 			sourceTree = "<group>";
 		};
@@ -264,7 +263,6 @@
 				D90A97AA2ED9528610C619FD /* OfflineVideoViewController.swift */,
 				65C6DCCEAFEF2EB76EA6EDB9 /* OfflineVideoViewController.storyboard */,
 			);
-			name = Video;
 			path = Video;
 			sourceTree = "<group>";
 		};
@@ -279,7 +277,6 @@
 				2EFEAC955F62DE5913156501 /* OfflineCarouselViewController.storyboard */,
 				74B4F94CCBC9DDDE3CBEF84E /* OfflinePSDKScalingCarouselView.swift */,
 			);
-			name = Carousel;
 			path = Carousel;
 			sourceTree = "<group>";
 		};
@@ -318,7 +315,6 @@
 				6AC753EE7D464ACA89105D72 /* AMP_Image_4.png */,
 				681E559B44E6020C06408F82 /* PSDKDefaultBG.png */,
 			);
-			name = OfflineResources;
 			path = OfflineResources;
 			sourceTree = "<group>";
 		};
@@ -336,7 +332,6 @@
 				C00732367535DAE697EC0490 /* OfflineNotification.swift */,
 				6F7F6B6D465918A5419954F2 /* OfflineButtons.swift */,
 			);
-			name = Models;
 			path = Models;
 			sourceTree = "<group>";
 		};
@@ -352,7 +347,6 @@
 				26D69BF5BE2E4F4839E0ADD9 /* Video */,
 				2E80C715211C79C0A4F5CA10 /* Carousel */,
 			);
-			name = OfflineDemo;
 			path = OfflineDemo;
 			sourceTree = "<group>";
 		};
@@ -433,7 +427,6 @@
 				92A78B6697A4DEDBCCA7CA46 /* UIViewController+LoadableFromStoryboard.swift */,
 				D36AC10050BA6BFCC23BE37F /* UIView+NibRepresentable.swift */,
 			);
-			name = Extensions;
 			path = Extensions;
 			sourceTree = "<group>";
 		};
@@ -564,7 +557,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
 				49D17D262EB5A5ADC418BED0 /* XCRemoteSwiftPackageReference "ios-spm-notivera" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -841,6 +834,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -919,7 +913,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.Carousel;
 				PRODUCT_NAME = NotiveraContentExtension;
 				SDKROOT = iphoneos;
@@ -950,7 +944,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.Carousel;
 				PRODUCT_NAME = NotiveraContentExtension;
 				SDKROOT = iphoneos;
@@ -981,7 +975,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.PushNotificationServiceExtension;
 				PRODUCT_NAME = NotiveraServiceExtension;
 				SDKROOT = iphoneos;
@@ -1012,7 +1006,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.PushNotificationServiceExtension;
 				PRODUCT_NAME = NotiveraServiceExtension;
 				SDKROOT = iphoneos;
@@ -1150,6 +1144,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -1175,6 +1170,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -1203,7 +1199,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.PushNotificationServiceExtension;
 				PRODUCT_NAME = NotiveraServiceExtension;
 				SDKROOT = iphoneos;
@@ -1234,7 +1230,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 5.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notivera.app.Carousel;
 				PRODUCT_NAME = NotiveraContentExtension;
 				SDKROOT = iphoneos;
@@ -1301,7 +1297,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};
