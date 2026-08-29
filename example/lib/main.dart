@@ -1,17 +1,8 @@
-import 'dart:io';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:notivera_flutter_example/demo_app.dart';
-import 'package:notivera_flutter_example/notivera_bootstrap.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (Platform.isAndroid) {
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  }
-
   runApp(const MyApp());
 }
 
