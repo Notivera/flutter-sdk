@@ -114,6 +114,16 @@ Enable Push Notifications and Background Modes → Remote notifications.
 
 APNs device tokens are forwarded by the plugin. You do not need to call `setPushToken` on iOS.
 
+### Pre-init lifecycle callbacks
+
+UIKit may deliver APNs registration, remote-notification, or background URL-session callbacks before Dart calls `Notivera.instance.initialize()`. The iOS plugin buffers those events while the native SDK is not yet created, then flushes them in order as soon as `initialize` sets up the SDK:
+
+1. Latest APNs device token (or registration failure if no token was received)
+2. Queued Notivera remote notifications (completion handlers still run exactly once)
+3. Queued background URL-session completion handlers
+
+Non-Notivera remote payloads are not claimed (same `isNotiveraNotification` gate as after init). Watch the Xcode console for `[NotiveraFlutterPlugin]` lines that say `buffering until initialize` or `Pre-init flush complete` when diagnosing token/type registration issues.
+
 ### Notification extensions (optional, host app only)
 
 Notification Service Extension and Notification Content Extension are **not** part of this plugin. Add those Xcode targets in the host app if you need rich/carousel notifications, as described in the [NotiveraSDK SPM README](https://github.com/Notivera/ios-spm-notivera):

@@ -58,11 +58,28 @@ Future<void> initializeNotiveraDemo() async {
   _log(
     'initializeNotiveraDemo() started (platform=${Platform.operatingSystem})',
   );
+  if (Platform.isIOS) {
+    // APNs token / remote-notification / background URL-session callbacks may
+    // arrive before this Dart initialize() returns. The iOS plugin buffers them
+    // and flushes after native SDK init — watch Xcode for:
+    // [NotiveraFlutterPlugin] ... buffering until initialize
+    // [NotiveraFlutterPlugin] Pre-init flush complete token=… remote=…
+    _log(
+      'iOS: pre-init APNs/lifecycle callbacks are buffered natively; '
+      'check Xcode console for [NotiveraFlutterPlugin] buffer/flush lines',
+    );
+  }
   _log(
     'Calling Notivera.initialize tenantId=$demoTenantId appVersion=$demoAppVersion',
   );
   await Notivera.instance.initialize(demoNotiveraConfig);
   _log('Notivera.initialize completed');
+  if (Platform.isIOS) {
+    _log(
+      'iOS: native flush (if any) runs inside initialize; '
+      'APNs is handled by the plugin — setPushToken is not used',
+    );
+  }
 
   await _configurePush();
 

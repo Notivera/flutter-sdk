@@ -3,9 +3,25 @@ import NotiveraSDK
 import UIKit
 
 public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
+  private struct BufferedRemoteNotification {
+    let application: UIApplication
+    let userInfo: [AnyHashable: Any]
+    let completionHandler: (UIBackgroundFetchResult) -> Void
+  }
+
+  private struct BufferedBackgroundURLSession {
+    let application: UIApplication
+    let identifier: String
+    let completionHandler: () -> Void
+  }
+
   private var sdk: Notivera?
   private var flutterApi: NotiveraFlutterApi?
   private var eventObservers: [Any] = []
+  private var bufferedDeviceToken: Data?
+  private var bufferedRegistrationError: Error?
+  private var bufferedRemoteNotifications: [BufferedRemoteNotification] = []
+  private var bufferedBackgroundURLSessions: [BufferedBackgroundURLSession] = []
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = NotiveraFlutterPlugin()
@@ -18,14 +34,24 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) -> Bool {
-    NSLog(
-      "[NotiveraFlutterPlugin] APNs device token received (%d bytes)",
-      deviceToken.count
-    )
-    sdk?.application(
-      application,
-      didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
-    )
+    if let sdk {
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs device token received; handling immediately (%d bytes)",
+        deviceToken.count
+      )
+      sdk.application(
+        application,
+        didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
+      )
+    } else {
+      bufferedDeviceToken = deviceToken
+      // A valid token supersedes any pre-init registration failure.
+      bufferedRegistrationError = nil
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs device token received; buffering until initialize (%d bytes)",
+        deviceToken.count
+      )
+    }
     return true
   }
 
@@ -33,15 +59,23 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
   ) -> Bool {
-    NSLog(
-      "[NotiveraFlutterPlugin] APNs registration failed: %@",
-      error.localizedDescription
-    )
-    sdk?.application(
-      application,
-      didFailToRegisterForRemoteNotificationsWithError: error,
-      completion: nil
-    )
+    if let sdk {
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs registration failed; handling immediately: %@",
+        error.localizedDescription
+      )
+      sdk.application(
+        application,
+        didFailToRegisterForRemoteNotificationsWithError: error,
+        completion: nil
+      )
+    } else {
+      bufferedRegistrationError = error
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs registration failed; buffering until initialize: %@",
+        error.localizedDescription
+      )
+    }
     return true
   }
 
@@ -50,13 +84,32 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) -> Bool {
-    guard let sdk, sdk.isNotiveraNotification(userInfo: userInfo) else {
+    if let sdk {
+      guard sdk.isNotiveraNotification(userInfo: userInfo) else {
+        return false
+      }
+      NSLog("[NotiveraFlutterPlugin] Remote notification received; handling immediately")
+      sdk.application(
+        application,
+        didReceiveRemoteNotification: userInfo,
+        fetchCompletionHandler: completionHandler
+      )
+      return true
+    }
+
+    guard isPotentialNotiveraNotification(userInfo: userInfo) else {
       return false
     }
-    sdk.application(
-      application,
-      didReceiveRemoteNotification: userInfo,
-      fetchCompletionHandler: completionHandler
+    bufferedRemoteNotifications.append(
+      BufferedRemoteNotification(
+        application: application,
+        userInfo: userInfo,
+        completionHandler: completionHandler
+      )
+    )
+    NSLog(
+      "[NotiveraFlutterPlugin] Remote notification received; buffering until initialize (queued=%d)",
+      bufferedRemoteNotifications.count
     )
     return true
   }
@@ -67,8 +120,20 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     completionHandler: @escaping () -> Void
   ) -> Bool {
     guard let sdk else {
-      return false
+      bufferedBackgroundURLSessions.append(
+        BufferedBackgroundURLSession(
+          application: application,
+          identifier: identifier,
+          completionHandler: completionHandler
+        )
+      )
+      NSLog(
+        "[NotiveraFlutterPlugin] Background URL session callback received; buffering until initialize (queued=%d)",
+        bufferedBackgroundURLSessions.count
+      )
+      return true
     }
+    NSLog("[NotiveraFlutterPlugin] Background URL session callback received; handling immediately")
     sdk.application(
       application,
       handleEventsForBackgroundURLSession: identifier,
@@ -88,6 +153,7 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     )
     instance.customerID = config.customerId
     sdk = instance
+    flushBufferedLifecycleEvents(using: instance)
     // Re-assert after Flutter/Firebase plugins may have claimed the center.
     instance.setNotiveraUserNotificationDelegate(
       delegate: NotiveraUserNotificationDelegate(sdk: instance)
@@ -255,6 +321,85 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
       )
     }
     return sdk
+  }
+
+  private func flushBufferedLifecycleEvents(using sdk: Notivera) {
+    let token = bufferedDeviceToken
+    let registrationError = bufferedRegistrationError
+    let remoteNotifications = bufferedRemoteNotifications
+    let backgroundSessions = bufferedBackgroundURLSessions
+
+    // Clear first to make flush idempotent if initialize is re-entered.
+    bufferedDeviceToken = nil
+    bufferedRegistrationError = nil
+    bufferedRemoteNotifications.removeAll()
+    bufferedBackgroundURLSessions.removeAll()
+
+    var flushedTokenCount = 0
+    var flushedErrorCount = 0
+    var flushedRemoteCount = 0
+    var flushedBackgroundSessionCount = 0
+
+    if let token {
+      sdk.application(
+        UIApplication.shared,
+        didRegisterForRemoteNotificationsWithDeviceToken: token
+      )
+      flushedTokenCount = 1
+      NSLog(
+        "[NotiveraFlutterPlugin] Flushed buffered APNs device token (%d bytes)",
+        token.count
+      )
+    } else if let registrationError {
+      sdk.application(
+        UIApplication.shared,
+        didFailToRegisterForRemoteNotificationsWithError: registrationError,
+        completion: nil
+      )
+      flushedErrorCount = 1
+      NSLog("[NotiveraFlutterPlugin] Flushed buffered APNs registration failure")
+    }
+
+    for notification in remoteNotifications {
+      guard sdk.isNotiveraNotification(userInfo: notification.userInfo) else {
+        NSLog("[NotiveraFlutterPlugin] Skipped non-Notivera buffered notification")
+        notification.completionHandler(.noData)
+        continue
+      }
+      sdk.application(
+        notification.application,
+        didReceiveRemoteNotification: notification.userInfo,
+        fetchCompletionHandler: notification.completionHandler
+      )
+      flushedRemoteCount += 1
+    }
+
+    for session in backgroundSessions {
+      sdk.application(
+        session.application,
+        handleEventsForBackgroundURLSession: session.identifier,
+        completionHandler: session.completionHandler
+      )
+      flushedBackgroundSessionCount += 1
+    }
+
+    NSLog(
+      "[NotiveraFlutterPlugin] Pre-init flush complete token=%d error=%d remote=%d background=%d",
+      flushedTokenCount,
+      flushedErrorCount,
+      flushedRemoteCount,
+      flushedBackgroundSessionCount
+    )
+  }
+
+  private func isPotentialNotiveraNotification(userInfo: [AnyHashable: Any]) -> Bool {
+    guard
+      let aps = userInfo["aps"] as? [AnyHashable: Any],
+      let category = aps["category"] as? String
+    else {
+      return false
+    }
+    return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
   }
 
   private func startObservingEvents() {
