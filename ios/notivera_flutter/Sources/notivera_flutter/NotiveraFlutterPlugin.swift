@@ -1,6 +1,7 @@
 import Flutter
 import NotiveraSDK
 import UIKit
+import UserNotifications
 
 public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
   private struct BufferedRemoteNotification {
@@ -15,6 +16,11 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     let completionHandler: () -> Void
   }
 
+  /// Process-lifetime SDK. Flutter tears down plugin instances on engine detach /
+  /// hot restart; releasing `Notivera`/`DefaultSDK` in that path crashes inside
+  /// native SDK deinit. Match Android: keep the native SDK for the process.
+  private static var retainedSdk: Notivera?
+
   private var sdk: Notivera?
   private var flutterApi: NotiveraFlutterApi?
   private var eventObservers: [Any] = []
@@ -25,9 +31,21 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = NotiveraFlutterPlugin()
+    instance.sdk = retainedSdk
     instance.flutterApi = NotiveraFlutterApi(binaryMessenger: registrar.messenger())
     NotiveraHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: instance)
+    registrar.publish(instance)
     registrar.addApplicationDelegate(instance)
+  }
+
+  public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+    tearDownFlutterBindings(binaryMessenger: registrar.messenger())
+  }
+
+  deinit {
+    // Engine detach should already have run; keep this as a safety net.
+    stopObservingEvents()
+    flutterApi = nil
   }
 
   public func application(
@@ -143,12 +161,19 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
   func initialize(config: NotiveraConfig) throws {
     // config.pushTheme is Android-only (resource names → NotiveraPushTheme).
     // The iOS SDK has no theme parameter on init; icons come from the app bundle.
-    let instance = Notivera(
-      apiKey: config.apiKey,
-      apiSecret: config.apiSecret,
-      inAppOpenDelay: Int(config.inAppOpenDelayMs ?? 0),
-      tenantID: config.tenantId
-    )
+    let instance: Notivera
+    if let existing = Self.retainedSdk {
+      instance = existing
+      NSLog("[NotiveraFlutterPlugin] Reusing process-lifetime Notivera SDK")
+    } else {
+      instance = Notivera(
+        apiKey: config.apiKey,
+        apiSecret: config.apiSecret,
+        inAppOpenDelay: Int(config.inAppOpenDelayMs ?? 0),
+        tenantID: config.tenantId
+      )
+      Self.retainedSdk = instance
+    }
     instance.customerID = config.customerId
     sdk = instance
     flushBufferedLifecycleEvents(using: instance)
@@ -400,9 +425,27 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
   }
 
-  private func startObservingEvents() {
+  private func tearDownFlutterBindings(binaryMessenger: FlutterBinaryMessenger) {
+    stopObservingEvents()
+    // Drop the notification-center delegate owned by this plugin/bindings so it
+    // cannot outlive the Flutter messenger. Keep `retainedSdk` alive.
+    sdk?.setNotiveraUserNotificationDelegate(delegate: nil)
+    if UNUserNotificationCenter.current().delegate is NotiveraUserNotificationDelegate {
+      UNUserNotificationCenter.current().delegate = nil
+    }
+    NotiveraHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+    flutterApi = nil
+    sdk = nil
+    NSLog("[NotiveraFlutterPlugin] Flutter bindings torn down; native SDK retained")
+  }
+
+  private func stopObservingEvents() {
     eventObservers.forEach { NotificationCenter.default.removeObserver($0) }
     eventObservers.removeAll()
+  }
+
+  private func startObservingEvents() {
+    stopObservingEvents()
 
     let subscriptions: [(String, EventType)] = [
       (Notivera.eventNotificationTapped, .notificationTapped),
