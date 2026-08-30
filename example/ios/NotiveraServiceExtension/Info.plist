@@ -4,14 +4,15 @@
 <dict>
 	<key>NSExtension</key>
 	<dict>
-		<key>UNNotificationExtensionCategory</key>
-		<array>
-			<string> NSDKNotification</string>
-		</array>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.usernotifications.service</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).NotificationService</string>
+		<string>$(PRODUCT_MODULE_NAME).NotificationServiceExtension</string>
+		<key>UNNotificationExtensionCategory</key>
+		<array>
+			<string>NSDKNotification</string>
+			<string>PushologiesCarouselNotification</string>
+		</array>
 	</dict>
 	<key>NotiveraAppGroup</key>
 	<string>group.com.notivera.app</string>

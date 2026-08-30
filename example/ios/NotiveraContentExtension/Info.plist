@@ -4,16 +4,18 @@
 <dict>
 	<key>NSExtension</key>
 	<dict>
-		<key>UNNotificationExtensionCategory</key>
-		<array>
-			<string>PushologiesCarouselNotification</string>
-		</array>
 		<key>NSExtensionAttributes</key>
 		<dict>
 			<key>UNNotificationExtensionCategory</key>
-			<string>myNotificationCategory</string>
+			<array>
+				<string>PushologiesCarouselNotification</string>
+			</array>
+			<key>UNNotificationExtensionDefaultContentHidden</key>
+			<string>NO</string>
 			<key>UNNotificationExtensionInitialContentSizeRatio</key>
 			<real>1</real>
+			<key>UNNotificationExtensionUserInteractionEnabled</key>
+			<true/>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>
 		<string>MainInterface</string>
