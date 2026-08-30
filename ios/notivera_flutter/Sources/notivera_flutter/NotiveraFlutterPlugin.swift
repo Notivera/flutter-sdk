@@ -33,7 +33,7 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
   public func application(
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-  ) -> Bool {
+  ) {
     if let sdk {
       NSLog(
         "[NotiveraFlutterPlugin] APNs device token received; handling immediately (%d bytes)",
@@ -52,13 +52,12 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
         deviceToken.count
       )
     }
-    return true
   }
 
   public func application(
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
-  ) -> Bool {
+  ) {
     if let sdk {
       NSLog(
         "[NotiveraFlutterPlugin] APNs registration failed; handling immediately: %@",
@@ -76,7 +75,6 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
         error.localizedDescription
       )
     }
-    return true
   }
 
   public func application(

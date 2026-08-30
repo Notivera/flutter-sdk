@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:notivera_flutter/notivera_flutter.dart';
 
 const String demoApiKey = 'f81a8fda-9e38-4206-9e1d-cfee53f31e38';
@@ -12,6 +11,9 @@ const String demoTenantId = '52e31515-ceda-4cdf-a7bf-63e9c8103085';
 const String demoAppVersion = '5.0.0';
 
 const String _logTag = '[NotiveraDemo]';
+
+/// Android-only MethodChannel to the example app's native FCM bridge.
+const MethodChannel _androidFcmChannel = MethodChannel('com.notivera.demo/fcm');
 
 const NotiveraConfig demoNotiveraConfig = NotiveraConfig(
   apiKey: demoApiKey,
@@ -36,22 +38,6 @@ bool _pushConfigured = false;
 
 void _log(String message) {
   debugPrint('$_logTag $message');
-}
-
-/// Must be a top-level function and registered before [runApp].
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  _log('TRIGGER: onBackgroundMessage (background/terminated isolate)');
-  try {
-    await Firebase.initializeApp();
-    // Background isolate gets a fresh plugin binding; native SDK may already
-    // be alive in-process, but the Flutter bridge still needs initialize().
-    await Notivera.instance.initialize(demoNotiveraConfig);
-    await forwardRemoteMessage(message, source: 'onBackgroundMessage');
-  } catch (error, stack) {
-    _log('onBackgroundMessage failed: $error');
-    _log('$stack');
-  }
 }
 
 Future<void> initializeNotiveraDemo() async {
@@ -103,19 +89,13 @@ Future<void> _configurePush() async {
     return;
   }
 
-  _log('Firebase.initializeApp()');
-  await Firebase.initializeApp();
-  _log('Firebase initialized');
+  _androidFcmChannel.setMethodCallHandler(_onAndroidFcmCall);
 
-  final FirebaseMessaging messaging = FirebaseMessaging.instance;
-  _log('Requesting notification permission');
-  final NotificationSettings settings = await messaging.requestPermission();
-  _log(
-    'Permission result: authorizationStatus=${settings.authorizationStatus} '
-    'alert=${settings.alert} badge=${settings.badge} sound=${settings.sound}',
-  );
+  _log('Signaling native FCM bridge ready');
+  await _androidFcmChannel.invokeMethod<void>('ready');
 
-  final String? token = await messaging.getToken();
+  _log('Requesting FCM token via MethodChannel');
+  final String? token = await _androidFcmChannel.invokeMethod<String>('getToken');
   if (token != null && token.isNotEmpty) {
     _log('FCM token received (${token.length} chars): $token');
     await Notivera.instance.setPushToken(token);
@@ -124,75 +104,53 @@ Future<void> _configurePush() async {
     _log('FCM token is null/empty — setPushToken skipped');
   }
 
-  messaging.onTokenRefresh.listen((String refreshedToken) {
-    _log('FCM token refreshed: $refreshedToken');
-    Notivera.instance
-        .setPushToken(refreshedToken)
-        .then((_) {
-          _log('setPushToken() completed after refresh');
-        })
-        .catchError((Object error) {
-          _log('setPushToken() after refresh failed: $error');
-        });
-  });
-
-  _log('Registering FirebaseMessaging.onMessage listener');
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    _log('TRIGGER: onMessage (foreground)');
-    forwardRemoteMessage(message, source: 'onMessage');
-  });
-
-  _log('Registering FirebaseMessaging.onMessageOpenedApp listener');
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    _log(
-      'TRIGGER: onMessageOpenedApp (notification tap, background→foreground)',
-    );
-    forwardRemoteMessage(message, source: 'onMessageOpenedApp');
-  });
-
-  final RemoteMessage? initialMessage = await messaging.getInitialMessage();
-  if (initialMessage != null) {
-    _log(
-      'TRIGGER: getInitialMessage (app launched from terminated by notification)',
-    );
-    await forwardRemoteMessage(initialMessage, source: 'getInitialMessage');
-  } else {
-    _log('getInitialMessage() returned null (no launch-from-notification)');
-  }
-
   _pushConfigured = true;
   _log('_configurePush() finished');
 }
 
-Future<void> forwardRemoteMessage(
-  RemoteMessage message, {
+Future<void> _onAndroidFcmCall(MethodCall call) async {
+  switch (call.method) {
+    case 'onToken':
+      final String token = call.arguments as String;
+      _log('FCM token refreshed: $token');
+      try {
+        await Notivera.instance.setPushToken(token);
+        _log('setPushToken() completed after refresh');
+      } catch (error) {
+        _log('setPushToken() after refresh failed: $error');
+      }
+    case 'onMessage':
+      await forwardPushData(
+        _stringMap(call.arguments),
+        source: 'onMessage',
+      );
+    case 'onMessageOpened':
+      await forwardPushData(
+        _stringMap(call.arguments),
+        source: 'onMessageOpened',
+      );
+    default:
+      _log('Unknown FCM MethodChannel call: ${call.method}');
+  }
+}
+
+Map<String, String> _stringMap(Object? arguments) {
+  if (arguments is! Map) {
+    return <String, String>{};
+  }
+  return arguments.map(
+    (Object? key, Object? value) =>
+        MapEntry(key.toString(), value?.toString() ?? ''),
+  );
+}
+
+Future<void> forwardPushData(
+  Map<String, String> data, {
   required String source,
 }) async {
   _log('--- incoming push [$source] ---');
-  _log('messageId=${message.messageId}');
-  _log('from=${message.from}');
-  _log('sentTime=${message.sentTime}');
-  _log('collapseKey=${message.collapseKey}');
-  _log('messageType=${message.messageType}');
-  _log('category=${message.category}');
-  _log('threadId=${message.threadId}');
-  _log('ttl=${message.ttl}');
-  _log('data keys=${message.data.keys.toList()}');
-  _log('data payload=${message.data}');
-
-  final RemoteNotification? notification = message.notification;
-  if (notification != null) {
-    _log(
-      'notification.title=${notification.title} '
-      'notification.body=${notification.body}',
-    );
-  } else {
-    _log('notification block: null (data-only message)');
-  }
-
-  final Map<String, String> data = message.data.map(
-    (String key, Object? value) => MapEntry(key, value.toString()),
-  );
+  _log('data keys=${data.keys.toList()}');
+  _log('data payload=$data');
 
   if (data.isEmpty) {
     _log('Forward skipped: data map is empty');
