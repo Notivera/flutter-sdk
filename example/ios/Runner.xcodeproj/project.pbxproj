@@ -65,6 +65,7 @@
 		BCBFBF2EB70537FADF2358D6 /* OfflineVideoNotificationsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C17EAB81AA93FFEF8F9FFC5 /* OfflineVideoNotificationsResponse.swift */; };
 		C9D297072BB49C2E3501DCD7 /* NotificationIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A751DA7F5E8B7A6B35EE1B /* NotificationIdentifier.swift */; };
 		D1B80B9F24675DB4E0BA4245 /* OfflineDemoNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFFE8D664FAAB0A97081622 /* OfflineDemoNotificationDelegate.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* PendingNotificationTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6C /* PendingNotificationTap.swift */; };
 		D6FA3F4A9E05781E7FD57398 /* OfflineVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A97AA2ED9528610C619FD /* OfflineVideoViewController.swift */; };
 		E448BC49199A97804F60F7DD /* OfflineVideoViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65C6DCCEAFEF2EB76EA6EDB9 /* OfflineVideoViewController.storyboard */; };
 		E7F406D29D7A99AECAE12E22 /* OfflineCarouselNotificationContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918CB2198BD349B3FB89A23A /* OfflineCarouselNotificationContentViewModel.swift */; };
@@ -131,6 +132,7 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1C642276D697988380560A45 /* OfflineMediaType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineMediaType.swift; sourceTree = "<group>"; };
 		1CFFE8D664FAAB0A97081622 /* OfflineDemoNotificationDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineDemoNotificationDelegate.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5061728394A5B6C /* PendingNotificationTap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PendingNotificationTap.swift; sourceTree = "<group>"; };
 		272B5658F426E07EE0EF3A20 /* OfflineCarouselNotificationContentCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; path = OfflineCarouselNotificationContentCell.xib; sourceTree = "<group>"; };
 		27FA149072524C010F8C1ECA /* OfflineVideoWithButtonOne.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = OfflineVideoWithButtonOne.json; sourceTree = "<group>"; };
 		2EFEAC955F62DE5913156501 /* OfflineCarouselViewController.storyboard */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.storyboard; path = OfflineCarouselViewController.storyboard; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 				8B4B2C0005D17ED427CD9815 /* OfflineDemoPlugin.swift */,
 				B70A1CE11FF682E964270AFF /* OfflineDemoScheduler.swift */,
 				1CFFE8D664FAAB0A97081622 /* OfflineDemoNotificationDelegate.swift */,
+				B1C2D3E4F5061728394A5B6C /* PendingNotificationTap.swift */,
 				68D84A15E23E0A702983DEED /* Models */,
 				178B1A09C0190B06D297AC32 /* Abstract */,
 				E889E7DFD9F4C1E2A365C948 /* Extensions */,
@@ -702,6 +705,7 @@
 				B2C2EAB4116B96DB82FA2E0F /* OfflineDemoPlugin.swift in Sources */,
 				70361B03CBBDD0763270D619 /* OfflineDemoScheduler.swift in Sources */,
 				D1B80B9F24675DB4E0BA4245 /* OfflineDemoNotificationDelegate.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* PendingNotificationTap.swift in Sources */,
 				038368FFA75057EEAA066595 /* OfflinePosition.swift in Sources */,
 				8F31195BBFEB59AA8F30F92D /* OfflineNotificationType.swift in Sources */,
 				BCBFBF2EB70537FADF2358D6 /* OfflineVideoNotificationsResponse.swift in Sources */,

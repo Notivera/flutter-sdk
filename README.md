@@ -114,6 +114,35 @@ Enable Push Notifications and Background Modes → Remote notifications.
 
 APNs device tokens are forwarded by the plugin. You do not need to call `setPushToken` on iOS.
 
+### Cold-start notification taps (required for killed → open)
+
+When the user opens a push while the app is **terminated**, iOS delivers
+`userNotificationCenter(_:didReceive:)` before Dart `initialize()`. Capture that
+tap in your `AppDelegate` and let the plugin replay it after init:
+
+```swift
+import notivera_flutter
+
+override func userNotificationCenter(
+  _ center: UNUserNotificationCenter,
+  didReceive response: UNNotificationResponse,
+  withCompletionHandler completionHandler: @escaping () -> Void
+) {
+  NotiveraFlutterPlugin.captureNotificationResponse(response)
+  super.userNotificationCenter(
+    center,
+    didReceive: response,
+    withCompletionHandler: completionHandler
+  )
+}
+```
+
+`initialize()` flushes a buffered Notivera tap (video / carousel / poll) once the
+SDK is ready. Hosts that install a custom `UNUserNotificationCenter` delegate
+after init can also call
+`NotiveraFlutterPlugin.flushPendingNotificationResponse(delaySeconds:)` when the
+UI can present.
+
 ### Pre-init lifecycle callbacks
 
 UIKit may deliver APNs registration, remote-notification, or background URL-session callbacks before Dart calls `Notivera.instance.initialize()`. The iOS plugin buffers those events while the native SDK is not yet created, then flushes them in order as soon as `initialize` sets up the SDK:

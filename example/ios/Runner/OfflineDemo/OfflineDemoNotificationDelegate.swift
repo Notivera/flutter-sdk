@@ -42,7 +42,25 @@ final class OfflineDemoNotificationDelegate: NotiveraUserNotificationDelegate {
     completionHandler()
   }
 
-  private func loadOfflineNotifications(identifier: String) {
+  /// Replay a cold-start tap after SDK + UI are ready (offline demo categories).
+  static func handleLaunchTap(
+    sdk: Notivera,
+    categoryIdentifier: String,
+    userInfo: [AnyHashable: Any]
+  ) {
+    // Notivera remote categories are owned by NotiveraFlutterPlugin.
+    if categoryIdentifier == "NSDKNotification"
+      || categoryIdentifier == "PushologiesCarouselNotification"
+      || sdk.isNotiveraNotification(userInfo: userInfo)
+    {
+      return
+    }
+
+    let delegate = OfflineDemoNotificationDelegate(sdk: sdk)
+    delegate.loadOfflineNotifications(identifier: categoryIdentifier)
+  }
+
+  fileprivate func loadOfflineNotifications(identifier: String) {
     guard let notificationIdentifier = NotificationIdentifier(rawValue: identifier) else {
       NSLog("[OfflineDemo] Unknown offline category %@", identifier)
       return

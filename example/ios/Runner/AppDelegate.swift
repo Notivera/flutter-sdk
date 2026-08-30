@@ -1,5 +1,7 @@
 import Flutter
+import notivera_flutter
 import UIKit
+import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -7,6 +9,8 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Receive cold-start taps before OfflineDemo / Notivera claim the center.
+    UNUserNotificationCenter.current().delegate = self
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -15,28 +19,31 @@ import UIKit
     OfflineDemoPlugin.register(messenger: engineBridge.applicationRegistrar.messenger())
   }
 
-  // Diagnostic only — print APNs result; no Notivera forward yet.
-  // override func application(
-  //   _ application: UIApplication,
-  //   didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-  // ) {
-  //   let hex = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-  //   NSLog(
-  //     "[AppDelegate] APNs device token received (%d bytes): %@",
-  //     deviceToken.count,
-  //     hex
-  //   )
-  //   super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
-  // }
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    super.userNotificationCenter(
+      center,
+      willPresent: notification,
+      withCompletionHandler: completionHandler
+    )
+  }
 
-  // override func application(
-  //   _ application: UIApplication,
-  //   didFailToRegisterForRemoteNotificationsWithError error: Error
-  // ) {
-  //   NSLog(
-  //     "[AppDelegate] APNs registration failed: %@",
-  //     error.localizedDescription
-  //   )
-  //   super.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
-  // }
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    // Real Notivera pushes → plugin (works for host apps too).
+    NotiveraFlutterPlugin.captureNotificationResponse(response)
+    // Offline demo categories → example-only buffer.
+    PendingNotificationTap.capture(response)
+    super.userNotificationCenter(
+      center,
+      didReceive: response,
+      withCompletionHandler: completionHandler
+    )
+  }
 }

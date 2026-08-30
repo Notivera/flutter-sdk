@@ -16,10 +16,18 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     let completionHandler: () -> Void
   }
 
+  private struct BufferedNotificationTap {
+    let userInfo: [AnyHashable: Any]
+    let categoryIdentifier: String
+  }
+
   /// Process-lifetime SDK. Flutter tears down plugin instances on engine detach /
   /// hot restart; releasing `Notivera`/`DefaultSDK` in that path crashes inside
   /// native SDK deinit. Match Android: keep the native SDK for the process.
   private static var retainedSdk: Notivera?
+
+  /// Cold-start tap from a killed app — may arrive before the plugin instance exists.
+  private static var pendingLaunchTap: BufferedNotificationTap?
 
   private var sdk: Notivera?
   private var flutterApi: NotiveraFlutterApi?
@@ -36,6 +44,46 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     NotiveraHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: instance)
     registrar.publish(instance)
     registrar.addApplicationDelegate(instance)
+  }
+
+  /// Call from the host `AppDelegate` when a notification is opened so cold-start
+  /// taps are not lost before Dart `initialize()` (UIScene / FlutterImplicitEngine).
+  @objc public static func captureNotificationResponse(_ response: UNNotificationResponse) {
+    let userInfo = response.notification.request.content.userInfo
+    let category = response.notification.request.content.categoryIdentifier
+    guard isNotiveraTap(userInfo: userInfo, categoryIdentifier: category) else {
+      return
+    }
+    pendingLaunchTap = BufferedNotificationTap(
+      userInfo: userInfo,
+      categoryIdentifier: category
+    )
+    NSLog(
+      "[NotiveraFlutterPlugin] Captured launch notification tap category=%@",
+      category
+    )
+  }
+
+  /// Replay a buffered cold-start Notivera tap after the UI can present.
+  /// Safe to call more than once; no-ops when nothing is pending.
+  @objc public static func flushPendingNotificationResponse(delaySeconds: Double = 0.5) {
+    guard let tap = pendingLaunchTap else {
+      return
+    }
+    guard let sdk = retainedSdk else {
+      NSLog(
+        "[NotiveraFlutterPlugin] Pending tap kept — SDK not initialized yet"
+      )
+      return
+    }
+    pendingLaunchTap = nil
+    DispatchQueue.main.asyncAfter(deadline: .now() + delaySeconds) {
+      NSLog(
+        "[NotiveraFlutterPlugin] Flushing launch notification tap category=%@",
+        tap.categoryIdentifier
+      )
+      deliverNotificationTap(tap, using: sdk)
+    }
   }
 
   public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
@@ -158,6 +206,26 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     return true
   }
 
+  public func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    let userInfo = response.notification.request.content.userInfo
+    let category = response.notification.request.content.categoryIdentifier
+    if let sdk, Self.isNotiveraTap(userInfo: userInfo, categoryIdentifier: category) {
+      Self.pendingLaunchTap = nil
+      NSLog("[NotiveraFlutterPlugin] Notification tap; handling immediately")
+      Self.deliverNotificationTap(
+        BufferedNotificationTap(userInfo: userInfo, categoryIdentifier: category),
+        using: sdk
+      )
+    } else {
+      Self.captureNotificationResponse(response)
+    }
+    completionHandler()
+  }
+
   func initialize(config: NotiveraConfig) throws {
     // config.pushTheme is Android-only (resource names → NotiveraPushTheme).
     // The iOS SDK has no theme parameter on init; icons come from the app bundle.
@@ -182,6 +250,9 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
       delegate: NotiveraUserNotificationDelegate(sdk: instance)
     )
     startObservingEvents()
+    // Cold-start Notivera taps (video / carousel / poll) buffered via
+    // captureNotificationResponse / AppDelegate.
+    Self.flushPendingNotificationResponse(delaySeconds: 0.75)
     NotificationCenter.default.post(
       name: Notification.Name("NotiveraFlutterPluginDidInitialize"),
       object: instance
@@ -423,6 +494,37 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
       return false
     }
     return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
+  }
+
+  private static func isNotiveraTap(
+    userInfo: [AnyHashable: Any],
+    categoryIdentifier: String
+  ) -> Bool {
+    if categoryIdentifier == "NSDKNotification"
+      || categoryIdentifier == "PushologiesCarouselNotification"
+    {
+      return true
+    }
+    if let aps = userInfo["aps"] as? [AnyHashable: Any],
+      let category = aps["category"] as? String
+    {
+      return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
+    }
+    return false
+  }
+
+  private static func deliverNotificationTap(
+    _ tap: BufferedNotificationTap,
+    using sdk: Notivera
+  ) {
+    var info = tap.userInfo
+    // Historical key spelling inside NotiveraSDK.
+    info["handleTargertURL"] = true
+    sdk.application(
+      UIApplication.shared,
+      didReceiveRemoteNotification: info,
+      fetchCompletionHandler: { _ in }
+    )
   }
 
   private func tearDownFlutterBindings(binaryMessenger: FlutterBinaryMessenger) {
