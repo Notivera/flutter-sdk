@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local Notivera demo credentials (copy from *.example)
+lib/notivera_demo_secrets.dart

@@ -4,12 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:notivera_flutter/notivera_flutter.dart';
-
-const String demoApiKey = 'f81a8fda-9e38-4206-9e1d-cfee53f31e38';
-const String demoApiSecret =
-    'BvQyFm4gro+lfmYASgNXMIDrpgA/MpmyDtq0AmqyfJsX93f3GD4Y0/2+26XVO9uC1s7Oz1x6kV8gw1FWnq7moWQ7fG/aZ1GDP4uFbUHnsvfemxZJw3ibbKinu6S5vMuk2oElo8eUeDkGoD9Zvrt+vyqzZqvfaA452dp8mCak0H4=';
-const String demoTenantId = '52e31515-ceda-4cdf-a7bf-63e9c8103085';
-const String demoAppVersion = '5.0.1';
+import 'package:notivera_flutter_example/notivera_demo_secrets.dart';
 
 const String _logTag = '[NotiveraDemo]';
 
