@@ -1,0 +1,56 @@
+# When .pubignore exists, pub uses it INSTEAD of .gitignore.
+# Keep in sync with .gitignore (+ example ignores) and add publish-only exclusions.
+
+# ---------------------------------------------------------------------------
+# From root .gitignore
+# ---------------------------------------------------------------------------
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+*.iml
+*.ipr
+*.iws
+.idea/
+
+/pubspec.lock
+**/doc/api/
+.dart_tool/
+.flutter-plugins-dependencies
+/build/
+**/build/
+/coverage/
+.fvm/
+temp/
+
+# ---------------------------------------------------------------------------
+# From example/.gitignore (paths relative to package root)
+# ---------------------------------------------------------------------------
+example/.dart_tool/
+example/.flutter-plugins-dependencies
+example/.pub-cache/
+example/.pub/
+example/build/
+example/coverage/
+example/ios/Flutter/.last_build_id
+example/android/app/debug/
+example/android/app/profile/
+example/android/app/release/
+example/lib/notivera_demo_secrets.dart
+app.*.symbols
+app.*.map.json
+
+# ---------------------------------------------------------------------------
+# Publish-only: keep in git for local example, omit from pub.dev archive
+# ---------------------------------------------------------------------------
+example/android/app/google-services.json
+example/assets/**
