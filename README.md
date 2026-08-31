@@ -82,6 +82,15 @@ if (await Notivera.instance.isNotiveraMessage(data)) {
 
 5. Request `POST_NOTIFICATIONS` on Android 13+ in your app if you show notifications.
 
+6. **Release / R8:** Disable R8 full mode in the host app. Full mode can strip Notivera’s Koin factories and cause runtime failures such as `NoBeanDefFoundException` for `SDKViewModel`.
+
+```properties
+# android/gradle.properties
+android.enableR8.fullMode=false
+```
+
+The plugin also ships `consumer-rules.pro` (`-keep class com.notivera.**`) for apps that still enable minify.
+
 ## iOS host-app setup
 
 This plugin depends on the [NotiveraSDK](https://github.com/Notivera/ios-spm-notivera) Swift package (`from: 5.0.0`). Flutter 3.44 downloads it through Swift Package Manager.
