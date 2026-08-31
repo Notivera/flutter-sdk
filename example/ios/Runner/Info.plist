@@ -24,18 +24,16 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NotiveraAppGroup</key>
-	<string>group.com.notivera.app</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Notivera uses your location for geofenced campaigns.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Notivera uses your location for geofenced campaigns.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
+	<key>NotiveraAppGroup</key>
+	<string>group.com.notivera.app</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -59,6 +57,11 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

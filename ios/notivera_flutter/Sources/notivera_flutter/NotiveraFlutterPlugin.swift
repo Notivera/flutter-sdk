@@ -1,48 +1,146 @@
 import Flutter
 import NotiveraSDK
 import UIKit
+import UserNotifications
 
 public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
+  private struct BufferedRemoteNotification {
+    let application: UIApplication
+    let userInfo: [AnyHashable: Any]
+    let completionHandler: (UIBackgroundFetchResult) -> Void
+  }
+
+  private struct BufferedBackgroundURLSession {
+    let application: UIApplication
+    let identifier: String
+    let completionHandler: () -> Void
+  }
+
+  private struct BufferedNotificationTap {
+    let userInfo: [AnyHashable: Any]
+    let categoryIdentifier: String
+  }
+
+  /// Process-lifetime SDK. Flutter tears down plugin instances on engine detach /
+  /// hot restart; releasing `Notivera`/`DefaultSDK` in that path crashes inside
+  /// native SDK deinit. Match Android: keep the native SDK for the process.
+  private static var retainedSdk: Notivera?
+
+  /// Cold-start tap from a killed app — may arrive before the plugin instance exists.
+  private static var pendingLaunchTap: BufferedNotificationTap?
+
   private var sdk: Notivera?
   private var flutterApi: NotiveraFlutterApi?
   private var eventObservers: [Any] = []
+  private var bufferedDeviceToken: Data?
+  private var bufferedRegistrationError: Error?
+  private var bufferedRemoteNotifications: [BufferedRemoteNotification] = []
+  private var bufferedBackgroundURLSessions: [BufferedBackgroundURLSession] = []
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = NotiveraFlutterPlugin()
+    instance.sdk = retainedSdk
     instance.flutterApi = NotiveraFlutterApi(binaryMessenger: registrar.messenger())
     NotiveraHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: instance)
+    registrar.publish(instance)
     registrar.addApplicationDelegate(instance)
+  }
+
+  /// Call from the host `AppDelegate` when a notification is opened so cold-start
+  /// taps are not lost before Dart `initialize()` (UIScene / FlutterImplicitEngine).
+  @objc public static func captureNotificationResponse(_ response: UNNotificationResponse) {
+    let userInfo = response.notification.request.content.userInfo
+    let category = response.notification.request.content.categoryIdentifier
+    guard isNotiveraTap(userInfo: userInfo, categoryIdentifier: category) else {
+      return
+    }
+    pendingLaunchTap = BufferedNotificationTap(
+      userInfo: userInfo,
+      categoryIdentifier: category
+    )
+    NSLog(
+      "[NotiveraFlutterPlugin] Captured launch notification tap category=%@",
+      category
+    )
+  }
+
+  /// Replay a buffered cold-start Notivera tap after the UI can present.
+  /// Safe to call more than once; no-ops when nothing is pending.
+  @objc public static func flushPendingNotificationResponse(delaySeconds: Double = 0.5) {
+    guard let tap = pendingLaunchTap else {
+      return
+    }
+    guard let sdk = retainedSdk else {
+      NSLog(
+        "[NotiveraFlutterPlugin] Pending tap kept — SDK not initialized yet"
+      )
+      return
+    }
+    pendingLaunchTap = nil
+    DispatchQueue.main.asyncAfter(deadline: .now() + delaySeconds) {
+      NSLog(
+        "[NotiveraFlutterPlugin] Flushing launch notification tap category=%@",
+        tap.categoryIdentifier
+      )
+      deliverNotificationTap(tap, using: sdk)
+    }
+  }
+
+  public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+    tearDownFlutterBindings(binaryMessenger: registrar.messenger())
+  }
+
+  deinit {
+    // Engine detach should already have run; keep this as a safety net.
+    stopObservingEvents()
+    flutterApi = nil
   }
 
   public func application(
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-  ) -> Bool {
-    NSLog(
-      "[NotiveraFlutterPlugin] APNs device token received (%d bytes)",
-      deviceToken.count
-    )
-    sdk?.application(
-      application,
-      didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
-    )
-    return true
+  ) {
+    if let sdk {
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs device token received; handling immediately (%d bytes)",
+        deviceToken.count
+      )
+      sdk.application(
+        application,
+        didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
+      )
+    } else {
+      bufferedDeviceToken = deviceToken
+      // A valid token supersedes any pre-init registration failure.
+      bufferedRegistrationError = nil
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs device token received; buffering until initialize (%d bytes)",
+        deviceToken.count
+      )
+    }
   }
 
   public func application(
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
-  ) -> Bool {
-    NSLog(
-      "[NotiveraFlutterPlugin] APNs registration failed: %@",
-      error.localizedDescription
-    )
-    sdk?.application(
-      application,
-      didFailToRegisterForRemoteNotificationsWithError: error,
-      completion: nil
-    )
-    return true
+  ) {
+    if let sdk {
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs registration failed; handling immediately: %@",
+        error.localizedDescription
+      )
+      sdk.application(
+        application,
+        didFailToRegisterForRemoteNotificationsWithError: error,
+        completion: nil
+      )
+    } else {
+      bufferedRegistrationError = error
+      NSLog(
+        "[NotiveraFlutterPlugin] APNs registration failed; buffering until initialize: %@",
+        error.localizedDescription
+      )
+    }
   }
 
   public func application(
@@ -50,13 +148,32 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) -> Bool {
-    guard let sdk, sdk.isNotiveraNotification(userInfo: userInfo) else {
+    if let sdk {
+      guard sdk.isNotiveraNotification(userInfo: userInfo) else {
+        return false
+      }
+      NSLog("[NotiveraFlutterPlugin] Remote notification received; handling immediately")
+      sdk.application(
+        application,
+        didReceiveRemoteNotification: userInfo,
+        fetchCompletionHandler: completionHandler
+      )
+      return true
+    }
+
+    guard isPotentialNotiveraNotification(userInfo: userInfo) else {
       return false
     }
-    sdk.application(
-      application,
-      didReceiveRemoteNotification: userInfo,
-      fetchCompletionHandler: completionHandler
+    bufferedRemoteNotifications.append(
+      BufferedRemoteNotification(
+        application: application,
+        userInfo: userInfo,
+        completionHandler: completionHandler
+      )
+    )
+    NSLog(
+      "[NotiveraFlutterPlugin] Remote notification received; buffering until initialize (queued=%d)",
+      bufferedRemoteNotifications.count
     )
     return true
   }
@@ -67,8 +184,20 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     completionHandler: @escaping () -> Void
   ) -> Bool {
     guard let sdk else {
-      return false
+      bufferedBackgroundURLSessions.append(
+        BufferedBackgroundURLSession(
+          application: application,
+          identifier: identifier,
+          completionHandler: completionHandler
+        )
+      )
+      NSLog(
+        "[NotiveraFlutterPlugin] Background URL session callback received; buffering until initialize (queued=%d)",
+        bufferedBackgroundURLSessions.count
+      )
+      return true
     }
+    NSLog("[NotiveraFlutterPlugin] Background URL session callback received; handling immediately")
     sdk.application(
       application,
       handleEventsForBackgroundURLSession: identifier,
@@ -77,20 +206,53 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     return true
   }
 
+  public func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    let userInfo = response.notification.request.content.userInfo
+    let category = response.notification.request.content.categoryIdentifier
+    if let sdk, Self.isNotiveraTap(userInfo: userInfo, categoryIdentifier: category) {
+      Self.pendingLaunchTap = nil
+      NSLog("[NotiveraFlutterPlugin] Notification tap; handling immediately")
+      Self.deliverNotificationTap(
+        BufferedNotificationTap(userInfo: userInfo, categoryIdentifier: category),
+        using: sdk
+      )
+    } else {
+      Self.captureNotificationResponse(response)
+    }
+    completionHandler()
+  }
+
   func initialize(config: NotiveraConfig) throws {
-    let instance = Notivera(
-      apiKey: config.apiKey,
-      apiSecret: config.apiSecret,
-      inAppOpenDelay: Int(config.inAppOpenDelayMs ?? 0),
-      tenantID: config.tenantId
-    )
+    // config.pushTheme is Android-only (resource names → NotiveraPushTheme).
+    // The iOS SDK has no theme parameter on init; icons come from the app bundle.
+    let instance: Notivera
+    if let existing = Self.retainedSdk {
+      instance = existing
+      NSLog("[NotiveraFlutterPlugin] Reusing process-lifetime Notivera SDK")
+    } else {
+      instance = Notivera(
+        apiKey: config.apiKey,
+        apiSecret: config.apiSecret,
+        inAppOpenDelay: Int(config.inAppOpenDelayMs ?? 0),
+        tenantID: config.tenantId
+      )
+      Self.retainedSdk = instance
+    }
     instance.customerID = config.customerId
     sdk = instance
+    flushBufferedLifecycleEvents(using: instance)
     // Re-assert after Flutter/Firebase plugins may have claimed the center.
     instance.setNotiveraUserNotificationDelegate(
       delegate: NotiveraUserNotificationDelegate(sdk: instance)
     )
     startObservingEvents()
+    // Cold-start Notivera taps (video / carousel / poll) buffered via
+    // captureNotificationResponse / AppDelegate.
+    Self.flushPendingNotificationResponse(delaySeconds: 0.75)
     NotificationCenter.default.post(
       name: Notification.Name("NotiveraFlutterPluginDidInitialize"),
       object: instance
@@ -255,9 +417,137 @@ public class NotiveraFlutterPlugin: NSObject, FlutterPlugin, NotiveraHostApi {
     return sdk
   }
 
-  private func startObservingEvents() {
+  private func flushBufferedLifecycleEvents(using sdk: Notivera) {
+    let token = bufferedDeviceToken
+    let registrationError = bufferedRegistrationError
+    let remoteNotifications = bufferedRemoteNotifications
+    let backgroundSessions = bufferedBackgroundURLSessions
+
+    // Clear first to make flush idempotent if initialize is re-entered.
+    bufferedDeviceToken = nil
+    bufferedRegistrationError = nil
+    bufferedRemoteNotifications.removeAll()
+    bufferedBackgroundURLSessions.removeAll()
+
+    var flushedTokenCount = 0
+    var flushedErrorCount = 0
+    var flushedRemoteCount = 0
+    var flushedBackgroundSessionCount = 0
+
+    if let token {
+      sdk.application(
+        UIApplication.shared,
+        didRegisterForRemoteNotificationsWithDeviceToken: token
+      )
+      flushedTokenCount = 1
+      NSLog(
+        "[NotiveraFlutterPlugin] Flushed buffered APNs device token (%d bytes)",
+        token.count
+      )
+    } else if let registrationError {
+      sdk.application(
+        UIApplication.shared,
+        didFailToRegisterForRemoteNotificationsWithError: registrationError,
+        completion: nil
+      )
+      flushedErrorCount = 1
+      NSLog("[NotiveraFlutterPlugin] Flushed buffered APNs registration failure")
+    }
+
+    for notification in remoteNotifications {
+      guard sdk.isNotiveraNotification(userInfo: notification.userInfo) else {
+        NSLog("[NotiveraFlutterPlugin] Skipped non-Notivera buffered notification")
+        notification.completionHandler(.noData)
+        continue
+      }
+      sdk.application(
+        notification.application,
+        didReceiveRemoteNotification: notification.userInfo,
+        fetchCompletionHandler: notification.completionHandler
+      )
+      flushedRemoteCount += 1
+    }
+
+    for session in backgroundSessions {
+      sdk.application(
+        session.application,
+        handleEventsForBackgroundURLSession: session.identifier,
+        completionHandler: session.completionHandler
+      )
+      flushedBackgroundSessionCount += 1
+    }
+
+    NSLog(
+      "[NotiveraFlutterPlugin] Pre-init flush complete token=%d error=%d remote=%d background=%d",
+      flushedTokenCount,
+      flushedErrorCount,
+      flushedRemoteCount,
+      flushedBackgroundSessionCount
+    )
+  }
+
+  private func isPotentialNotiveraNotification(userInfo: [AnyHashable: Any]) -> Bool {
+    guard
+      let aps = userInfo["aps"] as? [AnyHashable: Any],
+      let category = aps["category"] as? String
+    else {
+      return false
+    }
+    return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
+  }
+
+  private static func isNotiveraTap(
+    userInfo: [AnyHashable: Any],
+    categoryIdentifier: String
+  ) -> Bool {
+    if categoryIdentifier == "NSDKNotification"
+      || categoryIdentifier == "PushologiesCarouselNotification"
+    {
+      return true
+    }
+    if let aps = userInfo["aps"] as? [AnyHashable: Any],
+      let category = aps["category"] as? String
+    {
+      return category == "NSDKNotification" || category == "PushologiesCarouselNotification"
+    }
+    return false
+  }
+
+  private static func deliverNotificationTap(
+    _ tap: BufferedNotificationTap,
+    using sdk: Notivera
+  ) {
+    var info = tap.userInfo
+    // Historical key spelling inside NotiveraSDK.
+    info["handleTargertURL"] = true
+    sdk.application(
+      UIApplication.shared,
+      didReceiveRemoteNotification: info,
+      fetchCompletionHandler: { _ in }
+    )
+  }
+
+  private func tearDownFlutterBindings(binaryMessenger: FlutterBinaryMessenger) {
+    stopObservingEvents()
+    // Drop the notification-center delegate owned by this plugin/bindings so it
+    // cannot outlive the Flutter messenger. Keep `retainedSdk` alive.
+    sdk?.setNotiveraUserNotificationDelegate(delegate: nil)
+    if UNUserNotificationCenter.current().delegate is NotiveraUserNotificationDelegate {
+      UNUserNotificationCenter.current().delegate = nil
+    }
+    NotiveraHostApiSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+    flutterApi = nil
+    sdk = nil
+    NSLog("[NotiveraFlutterPlugin] Flutter bindings torn down; native SDK retained")
+  }
+
+  private func stopObservingEvents() {
     eventObservers.forEach { NotificationCenter.default.removeObserver($0) }
     eventObservers.removeAll()
+  }
+
+  private func startObservingEvents() {
+    stopObservingEvents()
 
     let subscriptions: [(String, EventType)] = [
       (Notivera.eventNotificationTapped, .notificationTapped),

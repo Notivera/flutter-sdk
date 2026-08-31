@@ -4,12 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:notivera_flutter/notivera_flutter.dart';
-
-const String demoApiKey = 'f81a8fda-9e38-4206-9e1d-cfee53f31e38';
-const String demoApiSecret =
-    'BvQyFm4gro+lfmYASgNXMIDrpgA/MpmyDtq0AmqyfJsX93f3GD4Y0/2+26XVO9uC1s7Oz1x6kV8gw1FWnq7moWQ7fG/aZ1GDP4uFbUHnsvfemxZJw3ibbKinu6S5vMuk2oElo8eUeDkGoD9Zvrt+vyqzZqvfaA452dp8mCak0H4=';
-const String demoTenantId = '52e31515-ceda-4cdf-a7bf-63e9c8103085';
-const String demoAppVersion = '5.0.0';
+import 'package:notivera_flutter_example/notivera_demo_secrets.dart';
 
 const String _logTag = '[NotiveraDemo]';
 
@@ -23,6 +18,13 @@ const NotiveraConfig demoNotiveraConfig = NotiveraConfig(
   enableGeofence: true,
   downloadConnectionType: ConnectionType.wifi,
   inAppOpenDelayMs: 5000,
+  // Android-only: adaptive launcher resources under res/mipmap + values.
+  // Ignored on iOS (home-screen icon is AppIcon in Assets.xcassets).
+  pushTheme: NotiveraPushTheme(
+    smallIcon: 'ic_launcher_foreground',
+    largeIcon: 'ic_launcher_round',
+    color: 'ic_launcher_background',
+  ),
 );
 
 bool _pushConfigured = false;
@@ -51,11 +53,28 @@ Future<void> initializeNotiveraDemo() async {
   _log(
     'initializeNotiveraDemo() started (platform=${Platform.operatingSystem})',
   );
+  if (Platform.isIOS) {
+    // APNs token / remote-notification / background URL-session callbacks may
+    // arrive before this Dart initialize() returns. The iOS plugin buffers them
+    // and flushes after native SDK init — watch Xcode for:
+    // [NotiveraFlutterPlugin] ... buffering until initialize
+    // [NotiveraFlutterPlugin] Pre-init flush complete token=… remote=…
+    _log(
+      'iOS: pre-init APNs/lifecycle callbacks are buffered natively; '
+      'check Xcode console for [NotiveraFlutterPlugin] buffer/flush lines',
+    );
+  }
   _log(
     'Calling Notivera.initialize tenantId=$demoTenantId appVersion=$demoAppVersion',
   );
   await Notivera.instance.initialize(demoNotiveraConfig);
   _log('Notivera.initialize completed');
+  if (Platform.isIOS) {
+    _log(
+      'iOS: native flush (if any) runs inside initialize; '
+      'APNs is handled by the plugin — setPushToken is not used',
+    );
+  }
 
   await _configurePush();
 

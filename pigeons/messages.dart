@@ -15,6 +15,28 @@ enum ConnectionType { all, wifi, mobile, mobileRoaming, mobileNoRoaming }
 
 enum EventType { notificationTapped, videoClosed, inAppClosed, inAppCtaTapped }
 
+/// Android-only notification chrome for [NotiveraConfig.pushTheme].
+///
+/// Pass Android resource **names** (not Flutter asset paths), e.g. drawable /
+/// mipmap / color names from the host app `res/` folder. Resolved natively via
+/// `Resources.getIdentifier`. Ignored on iOS.
+class NotiveraPushTheme {
+  NotiveraPushTheme({
+    this.smallIcon,
+    this.largeIcon,
+    this.color,
+  });
+
+  /// Android drawable or mipmap resource name for the status-bar icon.
+  String? smallIcon;
+
+  /// Android drawable or mipmap resource name for the large notification icon.
+  String? largeIcon;
+
+  /// Android color resource name for the notification accent.
+  String? color;
+}
+
 class NotiveraConfig {
   NotiveraConfig({
     required this.apiKey,
@@ -27,6 +49,7 @@ class NotiveraConfig {
     this.trackLocation,
     this.enableGeofence,
     this.downloadConnectionType,
+    this.pushTheme,
   });
 
   String apiKey;
@@ -39,6 +62,9 @@ class NotiveraConfig {
   bool? trackLocation;
   bool? enableGeofence;
   ConnectionType? downloadConnectionType;
+
+  /// Android-only. Maps to native `NotiveraPushTheme` resource IDs.
+  NotiveraPushTheme? pushTheme;
 }
 
 class PersonalisationEntry {

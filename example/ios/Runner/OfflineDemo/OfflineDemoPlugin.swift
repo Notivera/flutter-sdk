@@ -2,6 +2,7 @@ import Flutter
 import NotiveraSDK
 import UIKit
 import UserNotifications
+import notivera_flutter
 
 /// Example-only bridge: schedules native offline demos and installs a notification
 /// delegate that presents native AVKit / UIKit experiences on notification tap
@@ -64,6 +65,9 @@ enum OfflineDemoPlugin {
       delegate: OfflineDemoNotificationDelegate(sdk: sdk)
     )
     NSLog("[OfflineDemo] OfflineDemoNotificationDelegate installed")
+    // Offline demo cold-start taps only. Real Notivera taps are flushed by the plugin.
+    PendingNotificationTap.flush(using: sdk)
+    NotiveraFlutterPlugin.flushPendingNotificationResponse(delaySeconds: 0.5)
   }
 
   private static func registerOfflineCategories() {

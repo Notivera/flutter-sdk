@@ -54,6 +54,7 @@ android {
 
     defaultConfig {
         minSdk = 24
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     testOptions {
@@ -80,7 +81,7 @@ kotlin {
 }
 
 dependencies {
-    implementation("com.github.Notivera:android-sdk:5.0.0")
+    implementation("com.github.Notivera:android-sdk:5.0.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.0.0")

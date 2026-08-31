@@ -27,6 +27,11 @@ class Notivera {
   /// Native SDK events such as notification taps and in-app CTA presses.
   Stream<NotiveraPushEvent> get events => _events.stream;
 
+  /// Initializes the native SDK.
+  ///
+  /// [NotiveraConfig.pushTheme] is **Android-only** (resource names for icons /
+  /// accent color). It is stripped before the iOS channel call and ignored by
+  /// the iOS plugin.
   Future<void> initialize(NotiveraConfig config) {
     return _platform.initialize(config);
   }

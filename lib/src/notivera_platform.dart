@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'messages.g.dart' as pigeon;
 import 'models.dart';
 
@@ -127,6 +129,18 @@ extension on NotiveraConfig {
       trackLocation: trackLocation,
       enableGeofence: enableGeofence,
       downloadConnectionType: downloadConnectionType?.toPigeon(),
+      // Android-only: iOS native SDK has no push theme on init.
+      pushTheme: Platform.isAndroid ? pushTheme?.toPigeon() : null,
+    );
+  }
+}
+
+extension on NotiveraPushTheme {
+  pigeon.NotiveraPushTheme toPigeon() {
+    return pigeon.NotiveraPushTheme(
+      smallIcon: smallIcon,
+      largeIcon: largeIcon,
+      color: color,
     );
   }
 }

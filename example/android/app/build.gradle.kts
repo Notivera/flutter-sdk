@@ -41,3 +41,4 @@ kotlin {
 flutter {
     source = "../.."
 }
+
