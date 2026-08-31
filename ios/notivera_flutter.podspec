@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Flutter plugin wrapping the Notivera native Android and iOS SDKs.
                        DESC
-  s.homepage         = 'https://github.com/Notivera/flutter_sdk'
+  s.homepage         = 'https://github.com/Notivera/flutter-sdk'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Notivera' => 'support@notivera.com' }
   s.source           = { :path => '.' }

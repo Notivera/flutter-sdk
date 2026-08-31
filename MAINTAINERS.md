@@ -27,7 +27,7 @@ Swift Package Manager identifies a **git checkout** by the folder name. This rep
 Workaround: clone or symlink the repo as `notivera_flutter`:
 
 ```sh
-git clone https://github.com/Notivera/flutter_sdk notivera_flutter
+git clone https://github.com/Notivera/flutter-sdk notivera_flutter
 cd notivera_flutter/example
 flutter run
 ```
