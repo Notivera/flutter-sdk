@@ -42,9 +42,3 @@ flutter {
     source = "../.."
 }
 
-dependencies {
-    // Native FCM for the example app (no Flutter firebase_messaging plugin).
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
-    implementation("com.google.firebase:firebase-messaging")
-}
-
