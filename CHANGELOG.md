@@ -1,3 +1,7 @@
+## 5.0.2
+
+* Bump Notivera Android SDK to 5.0.2 ([JitPack](https://jitpack.io/#Notivera/android-sdk/5.0.2)).
+
 ## 5.0.1
 
 * Flutter plugin wrapping Notivera Android SDK 5.x and iOS NotiveraSDK (SPM) via Pigeon.

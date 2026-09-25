@@ -6,7 +6,7 @@ Requires **Flutter 3.44.0+** (Swift Package Manager is the default for iOS plugi
 
 ```yaml
 dependencies:
-  notivera_flutter: ^5.0.1
+  notivera_flutter: ^5.0.2
 ```
 
 ```sh
