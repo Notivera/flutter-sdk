@@ -72,7 +72,7 @@ Do **not** document OfflineDemo in the consumer README. Clients should only wire
 Plugin Gradle dependency in `android/build.gradle.kts`:
 
 ```kotlin
-implementation("com.github.Notivera:android-sdk:5.0.1")
+implementation("com.github.Notivera:android-sdk:5.0.2")
 ```
 
 Bump this when releasing against a new android-sdk version. Host apps need JitPack. Also update the version mentioned in [README.md](README.md) if it documents the pin.
